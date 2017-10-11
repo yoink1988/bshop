@@ -63,7 +63,8 @@ export default {
     getAuthors: function(){
       var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', 'http://localhost/bookshop/client/api/authors/', true)
+        // http://192.168.0.15/~user9/bookShop/client/api/
+        xhr.open('GET', 'http://192.168.0.15/~user9/bookShop/client/api/authors/', true)
         xhr.send();
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
@@ -77,7 +78,7 @@ export default {
     getGenres: function(){
       var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', 'http://localhost/bookshop/client/api/genres/', true)
+        xhr.open('GET', 'http://192.168.0.15/~user9/bookShop/client/api/genres/', true)
         xhr.send();
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
@@ -91,7 +92,7 @@ export default {
     getBooks: function(){
       var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', 'http://localhost/bookshop/client/api/books/', true)
+        xhr.open('GET', 'http://192.168.0.15/~user9/bookShop/client/api/books/', true)
         xhr.send();
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
@@ -101,6 +102,11 @@ export default {
               self.books = JSON.parse(xhr.responseText)
               }
         }
+    }
+  },
+  computed:{
+    filteredBooks(){
+      
     }
   }
   
@@ -128,7 +134,7 @@ export default {
 }
 .log-form{
   margin-top:30px;
-  margin-right:60px;
+  margin-right:20px;
   margin-bottom: 80px;
   text-align: right;
 }
