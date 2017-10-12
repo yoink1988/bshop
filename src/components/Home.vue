@@ -87,7 +87,7 @@ export default {
         home:"http://localhost/bookShop/client/api/",
         class:"http://192.168.0.15/~user9/bookShop/client/api/"
       },
-      location: 'home'
+      location: 'class'
     }
   },
   created(){

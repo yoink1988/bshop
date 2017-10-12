@@ -1,5 +1,5 @@
 <template>
-  <div class="row reg">
+  <div class="reg">
     <div class="col-md-9" style="width:35%">
       </div>
     <div class="col-md-5" style="width:400px">
