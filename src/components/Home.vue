@@ -4,13 +4,19 @@
 
       <div class="col-md-2 left">
         <div class="row menu">
-          <p><b>Welcome</b></p>
-          <p>Log In</p>
-          <div class="log-form">
-          <p>Email:<input v-model="login.email" type="text"></p>
-          <p>Password:<input v-model="login.pass" type="text"></p>
-          <button @click="signIn" class="login">Log In</button>
-          <p><router-link :to="'/register/'">Registration</router-link></p>
+          <p><b>Welcome {{user.name}}</b></p>
+
+         
+          <div v-if="user.name == ''" class="log-form">
+            <p>Log In</p>
+            <p>Email:<input v-model="login.email" type="text"></p>
+            <p>Password:<input v-model="login.pass" type="text"></p>
+            <button @click="signIn" class="login">Log In</button>
+            <p><router-link :to="'/register/'">Registration</router-link></p>
+          </div>
+          <div v-else class="logged">
+            <p><a href="#" @click="logOut()">Log Out</a></p>
+           <router-link :to="'/cart/'">Cart</router-link>
           </div>
         </div>
         <div class="showbooks">
@@ -79,6 +85,7 @@ export default {
         email:'',
         pass:''
       },
+      user:{},
       filter:{type:"",id:""},
       authors: [],
       genres: [],
@@ -87,13 +94,15 @@ export default {
         home:"http://localhost/bookShop/client/api/",
         class:"http://192.168.0.15/~user9/bookShop/client/api/"
       },
-      location: 'class'
+      location: 'home'
     }
   },
   created(){
+    this.getUserData()
     this.getAuthors()
     this.getGenres()
     this.getBooks()
+    this.checkAuth()
   },
     methods:{
       signIn: function(){
@@ -104,21 +113,62 @@ export default {
          pass: self.login.pass
       });
 
-          xhr.open("PUT", 'http://localhost/bookShop/server/api/auth/', true)
+          xhr.open("PUT", self.requestUrl+'auth/', true)
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-          // xhr.withCredentials = true;
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    console.log(xhr.responseText)
-                    console.log(xhr.getAllResponseHeaders())
-                    var date = new Date(new Date().getTime() + 60 * 1000);
-document.cookie = "name=value; path=/; expires=" + date.toUTCString();
+                     console.log(JSON.parse(xhr.responseText))
+                     self.user = JSON.parse(xhr.responseText)[0]
+                     localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
                   }
             }
           xhr.send(json)
+      },
+      logOut: function(){
+        var self = this
+        self.user = {}
+        delete localStorage['user']
+        self.getUserData()
+      },
+      getUserData: function(){
+        var self = this
+        if(localStorage['user'])
+        {
+          self.user = JSON.parse(localStorage['user'])
+        }
+        else
+        {
+          self.user.name = ''
+          self.user.role = 'guest'
+          self.user.id = '0'
+          self.user.hash = '0'
+        }
+      },
+      checkAuth: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", self.requestUrl+'auth/id/'+self.user.id+'/hash/'+self.user.hash, true)
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                        // alert(xhr.status + ': ' + xhr.statusText)
+                        self.user.name = 'Guest'
+                        self.user.role = 'guest'
+                        self.user.id = '0'
+                        self.user.hash = '0'
+                  } else {
+                    // console.log(xhr.responseText)
+                    self.user = JSON.parse(xhr.responseText)[0]
+                    localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
+                    // console.log(xhr.getAllResponseHeaders())
+                  }
+            }
+          xhr.send()        
+
       },
     getAuthors: function(){
       var self = this
@@ -264,5 +314,9 @@ th{
 
 table{
   margin-top: 40px;
+}
+
+.logged{
+  height: 200px;
 }
 </style>
