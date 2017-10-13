@@ -1,42 +1,54 @@
 <template>
-  <div class="books">
-
+  <div class="book">
+    <h2>Book Details</h2>
+    <div class="info">
+      <h4>{{book.title}}</h4>
+      <p>{{book.description}}</p>
+      <p>Authors: <span v-for="author in book.authors">{{author.name}} </span></p>
+      <p>Genres: <span v-for="genre in book.genres">{{genre.name}} </span></p>
+      <p>Price: {{book.price}} $</p>
+      <!-- <div v-if="user.role != 'guest'" class="add">
+        ssss
+      </div> -->
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Book',
-  // props: ['book'],
+  // props: ['user'],
   data () {
     return {
       bookId: this.$route.params.id,
-      book:[]
+      book:[],
+      // checkAuth: self.$parent.checkAuth
     }
   },
   methods:{
     getBook: function(){
       var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', self.requestUrl+'books/'+self.bookId+'/', true)
+        xhr.open('GET', self.$parent.requestUrl+'books/'+self.bookId+'/', true)
         xhr.send();
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                self.book = JSON.parse(xhr.responseText)
-                log(self.book)
+                self.book = JSON.parse(xhr.responseText)[0]
+                // self.log(self.book)
               }
         }
     },
     log: function(data){
       var self = this
-      console.log(self.$parent.DATA)
+       console.log(data)
     }
   },
   created(){
-    this.log(this.bookId)
+    // this.log(this.bookId)
+    // this.checkAuth()
     this.getBook()
   }
 
@@ -49,7 +61,13 @@ export default {
 <style scoped>
 h1, h2 {
   font-weight: normal;
+  /* padding: 30px; */
 }
+
+  .book{
+  background-color: lemonchiffon;
+
+  }
 
 ul {
   list-style-type: none;
@@ -72,9 +90,9 @@ table{
   margin-top: 40px;
 }
 
-
-.description{
-  width: 10%;
+.info{
+  width: 40%;
+  margin: auto;
 }
 
 a {

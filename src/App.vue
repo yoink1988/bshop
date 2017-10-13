@@ -9,19 +9,17 @@ export default {
   name: 'app',
   data(){
     return{
-      DATA: "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+      reqUrl:{
+        home:"http://localhost/bookShop/client/api/",
+        class:"http://192.168.0.15/~user9/bookShop/client/api/"
+      },
+      location: 'class'
     }
   },
   created(){
-    // this.getAuthors()
-    // this.getGenres()
-    // this.getBooks()
   },
 
   computed:{
-  //   filteredBooks(){
-      
-    // },
     requestUrl(){
       var self = this
       if(self.location == 'home'){
@@ -43,6 +41,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: lemonchiffon;
   /* margin-top: 60px; */
 }
 .left{

@@ -45,7 +45,7 @@ export default {
          pass: self.pass
       });
 
-          xhr.open("POST", 'http://localhost/bookShop/client/api/users/', true)
+          xhr.open("POST", self.$parent.requestUrl+'users/', true)
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
