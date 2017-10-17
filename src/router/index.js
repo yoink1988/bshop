@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
 import Register from '@/components/Register'
-import Book from '@/components/Book'
+// import Book from '@/components/Book'
+import Admin from '@/components/Admin'
 
 Vue.use(Router)
 
@@ -19,9 +20,10 @@ export default new Router({
       component: Register
     },
     {
-      path: '/books/:id',
-      name: 'Book',
-      component: Book
+      path: '/admin/',
+      name: 'Admin',
+      component: Admin
     }
+
   ]
 })

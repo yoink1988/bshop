@@ -1,0 +1,461 @@
+<template>
+  <div class="admin-home">
+        <div class="row">
+      <div class="col-md-3 left">
+
+        <div class="authors">
+          Authors:
+          <div class="new-author">
+            Author name:<input type="text" v-model="newAuth">
+            <button @click="addAuthor()" class="add-auth">Add</button>
+          </div>
+          <div class="edit">
+            Edit or delete:<select v-model="editAuth" class="authors">
+              <option value="" class="default">Select Author</option>
+              <option v-for="(author, index) in authors" :value="author.id">{{author.name}}</option>
+            </select>
+            <div v-if="editAuth" class="ed-a">
+              New name:<input type="text" v-model="editAuthName" >
+              <button @click="renameAuthor()" class="del-auth">Rename</button>
+              <button @click="deleteAuthor()" class="del-auth">Delete</button>
+            </div>
+          </div>
+          <div class="auth-msg">
+            {{authMsg}}
+          </div>
+        </div>
+
+      <div class="genres">
+        Genres:
+          <div class="new-genre">
+            Genre name:<input type="text" v-model="newGenre">
+            <button @click="addGenre()" class="add-genre">Add</button>
+          </div>
+          <div class="edit">
+          Edit or delete:<select v-model="editGenre" class="genres">
+            <option value="" class="default">Select Genre</option>
+            <option v-for="genre in genres" :value="genre.id">{{genre.name}}</option>
+          </select>
+          <div v-if="editGenre" class="ed-g">
+            New name:<input type="text" v-model="editGenreName">
+            <button @click="renameGenre()" class="del-genre">Rename</button>
+            <button @click="deleteGenre()" class="del-genre">Delete</button>
+          </div>
+        </div>
+        <div class="genre-msg">
+          {{genreMsg}}
+        </div>
+        </div>  
+
+      <div class="books">
+        Books:
+        <div>
+          <button class="new-book">Add Book</button>
+        </div>
+          <p><select class="books">
+            <option value="" class="default">Select Book</option>
+            <option v-for="book in books" :value="book.id">{{book.title}}</option>
+          </select> 
+          
+          <button class="book-edit">Edit</button>
+          <button class="book-del">Delete</button>
+          </p>
+          <div class="book-msg">
+            {{bookMsg}}
+          </div>
+      </div>
+
+      <div class="users">
+        <span type="button" class="btn btn-secondary" @click="showUsers()">Show Users</span>
+      </div>
+
+      <div class="orders">
+       <a href="#" @click="showOrders()" >Show Orders</a>
+      </div>
+
+     
+      </div>
+      <div class="col-md-9 right">
+      <h2>Admin bookshop</h2>
+
+      <div class="content">
+        {{errMsg}}
+        <div v-if="content == 'users'">
+          USERS
+        </div>
+        <div v-if="content == 'orders'">
+          ORDERS
+        </div>
+      </div>
+
+      <button @click="test()" class="test">TEST</button>
+      </div>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Admin',
+  data () {
+    return {
+      user:{},
+      authors:'',
+      genres:'',
+      books:'',
+      users:'',
+      orders:'',
+      newAuth:'',
+      editAuth:'',
+      newGenre:'',
+      editGenre:'',
+      editAuthName:'',
+      editGenreName:'',
+      authMsg:'',
+      genreMsg:'',
+      bookMsg:'',
+      errMsg:'',
+      content:''
+    }
+  },
+  created(){
+    this.getUserData()
+    this.checkAuth()
+    this.getAuthors()
+    this.getGenres()
+    this.getBooks()
+
+  },
+  methods:{
+      checkAuth: function(){
+      var self = this
+
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'auth/id/'+self.user.id+'/hash/'+self.user.hash, true)
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                         alert(xhr.status + ': ' + xhr.statusText)
+                        self.user.name = 'Guest'
+                        self.user.role = 'guest'
+                        self.user.id = '0'
+                        self.user.hash = '0'
+                  } else {
+                    self.user = JSON.parse(xhr.responseText)[0]
+                    self.checkRole()
+                    console.log(self.user.role)
+                    localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
+                  }
+            }
+          xhr.send()        
+
+      },
+      getUserData: function(){
+        var self = this
+        if(localStorage['user'])
+        {
+         self.user = JSON.parse(localStorage['user'])
+       }
+        else
+        {
+          self.user.name = ''
+          self.user.role = 'guest'
+          self.user.id = '0'
+          self.user.hash = '0'
+
+        }
+      },
+    checkRole: function(){
+      var self = this
+      if(self.user.role != 'admin')
+      {
+        self.$router.push('/')
+      }
+  },
+    test: function(){
+      var self = this
+      self.$parent.testik()
+    },
+   getAuthors: function(){
+      var self = this
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', getUrl()+'authors/', true)
+        xhr.send();
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return
+              if (xhr.status != 200) {
+                    alert(xhr.status + ': ' + xhr.statusText)
+              } else {
+              self.authors = JSON.parse(xhr.responseText)
+              }
+        }
+    },
+    getGenres: function(){
+      var self = this
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', getUrl()+'genres/', true)
+        xhr.send();
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return
+              if (xhr.status != 200) {
+                    alert(xhr.status + ': ' + xhr.statusText)
+              } else {
+              self.genres = JSON.parse(xhr.responseText)
+              }
+        }
+    },
+    getBooks: function(){
+      var self = this
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', getUrl()+'books/', true)
+        xhr.send();
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return
+              if (xhr.status != 200) {
+                    alert(xhr.status + ': ' + xhr.statusText)
+              } else {
+                self.books = JSON.parse(xhr.responseText)
+                // console.log(self.books)
+              }
+        }
+    },
+    addAuthor:function(){
+      var self = this
+      if(self.newAuth){
+      self.authMsg = ''
+      var xhr = new XMLHttpRequest();
+      var json = JSON.stringify({'name':self.newAuth});
+          xhr.open("POST", getUrl()+'authors/', true)
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                        alert(xhr.status + ': ' + xhr.statusText)
+                  } else {
+                    self.authMsg = JSON.parse(xhr.responseText)
+                    self.getAuthors()
+                    self.newAuth = ''
+                  }
+            }
+          xhr.send(json)
+      }
+      else{
+        self.authMsg = 'Check name field'
+      }
+    },
+    renameAuthor: function(){
+      var self = this
+      self.authMsg = ''
+      if(self.editAuthName && self.editAuth){
+        var xhr = new XMLHttpRequest();
+        var json = JSON.stringify({
+          'id':self.editAuth,
+          'name':self.editAuthName
+        });
+            xhr.open("PUT", getUrl()+'authors/', true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+              xhr.onreadystatechange = function() {
+                  if (xhr.readyState != 4) return
+                    if (xhr.status != 200) {
+                          alert(xhr.status + ': ' + xhr.statusText)}
+                          else {
+                        self.authMsg = JSON.parse(xhr.responseText)
+                        self.getAuthors()
+                        self.editAuth = ''
+                        self.editAuthName = ''
+                    }
+              }
+            xhr.send(json)
+              }
+      else{
+        self.authMsg = 'Check name field'
+      }
+    },
+    deleteAuthor: function(){
+      var self = this
+      self.authMsg = ''
+
+      if(self.editAuth){
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", getUrl()+'authors/id/'+self.editAuth, true);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                        alert(xhr.status + ': ' + xhr.statusText)
+                  } else {
+                        self.authMsg = JSON.parse(xhr.responseText)
+                        self.getAuthors()
+                        self.editAuth = ''
+                        self.editAuthName = ''
+                  }
+          }
+          xhr.send(null);     
+        }
+        else{
+            self.authMsg = 'Select an Author'      
+        }
+    },
+    addGenre:function(){
+      var self = this
+      if(self.newGenre){
+      self.genreMsg = ''
+      var xhr = new XMLHttpRequest();
+      var json = JSON.stringify({'name':self.newGenre});
+          xhr.open("POST", getUrl()+'genres/', true)
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                        alert(xhr.status + ': ' + xhr.statusText)
+                  } else {
+                    self.genreMsg = JSON.parse(xhr.responseText)
+                    self.getGenres()
+                    self.newGenre = ''
+                  }
+            }
+          xhr.send(json)
+      }
+      else{
+        self.genreMsg = 'Check name field'
+      }
+    },
+    renameGenre: function(){
+      var self = this
+      self.genreMsg = ''
+      if(self.editGenreName && self.editGenre){
+        var xhr = new XMLHttpRequest();
+        var json = JSON.stringify({
+          'id':self.editGenre,
+          'name':self.editGenreName
+        });
+            xhr.open("PUT", getUrl()+'genres/', true)
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+              xhr.onreadystatechange = function() {
+                  if (xhr.readyState != 4) return
+                    if (xhr.status != 200) {
+                          alert(xhr.status + ': ' + xhr.statusText)}
+                          else {
+                        self.genreMsg = JSON.parse(xhr.responseText)
+                        self.getGenres()
+                        self.editGenre = ''
+                        self.editGenreName = ''
+                    }
+              }
+            xhr.send(json)
+              }
+      else{
+        self.genreMsg = 'Check name field'
+      }
+    },
+    deleteGenre: function(){
+      var self = this
+      self.genreMsg = ''
+
+      if(self.editGenre){
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", getUrl()+'genres/id/'+self.editGenre, true);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                        alert(xhr.status + ': ' + xhr.statusText)
+                  } else {
+                        self.genreMsg = JSON.parse(xhr.responseText)
+                        self.getGenres()
+                        self.editGenre = ''
+                        self.editGenreName = ''                        
+                  }
+          }
+          xhr.send(null);     
+        }
+        else{
+            self.genreMsg = 'Select an Author'      
+        }
+    },
+    showUsers: function(){
+       var self = this
+       self.content = 'users'
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', getUrl()+'users/', true)
+        xhr.send();
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return
+              if (xhr.status != 200) {
+                    alert(xhr.status + ': ' + xhr.statusText)
+              } else {
+                var res = JSON.parse(xhr.responseText)
+                if(typeof(res) == 'string'){
+                  self.errMsg = res
+                }
+                else{
+                  self.users = res
+                  // console.log(self.users)
+                }
+              }
+        }     
+    },
+    showOrders: function(){
+
+    }
+
+  },
+
+
+  computed:{
+
+  }
+  
+  
+
+
+
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+h1, h2 {
+  font-weight: normal;
+}
+
+
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+td{
+  padding:10px;
+}
+
+th{
+  padding:20px;
+}
+
+table{
+  margin-top: 40px;
+}
+
+.left div{
+  padding-top:15px;
+}
+
+a {
+  color: #42b983;
+}
+
+.lefta{
+
+}
+
+</style>

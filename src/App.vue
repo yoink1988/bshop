@@ -9,26 +9,18 @@ export default {
   name: 'app',
   data(){
     return{
-      reqUrl:{
-        home:"http://localhost/bookShop/client/api/",
-        class:"http://192.168.0.15/~user9/bookShop/client/api/"
-      },
-      location: 'class'
+      
     }
   },
   created(){
   },
-
+  methods:{
+    testik:function(){
+      alert('TEST')
+    }
+  },
   computed:{
-    requestUrl(){
-      var self = this
-      if(self.location == 'home'){
-        return self.reqUrl.home
-      }
-      else{
-        return self.reqUrl.class
-      }
-    },
+
   }
   
 }
