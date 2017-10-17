@@ -393,7 +393,7 @@ export default {
                 }
                 else{
                   self.users = res
-                  // console.log(self.users)
+                  console.log(self.users)
                 }
               }
         }     
