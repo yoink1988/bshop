@@ -172,6 +172,7 @@ export default {
     changeBookStatus: function(){
       var self = this
       self.book.status = !self.book.status
+      console.log(self.book.status)
     },
     validForm: function(){
       var self = this

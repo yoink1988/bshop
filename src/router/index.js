@@ -4,6 +4,7 @@ import Home from '@/components/Home'
 import Register from '@/components/Register'
 // import Book from '@/components/Book'
 import Admin from '@/components/Admin'
+import Test from '@/components/Test'
 
 Vue.use(Router)
 
@@ -18,6 +19,11 @@ export default new Router({
       path: '/register/',
       name: 'Register',
       component: Register
+    },
+    {
+      path: '/admin/test/',
+      name: 'Test',
+      component: Test
     },
     {
       path: '/admin/',

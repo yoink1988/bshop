@@ -1,8 +1,9 @@
 <template>
   <div class="admin-home">
+    
         <div class="row">
       <div class="col-md-3 left">
-
+        <router-link to="/admin/test/">qwewqe</router-link>
         <div class="authors">
           Authors:
           <div class="new-author">
@@ -90,6 +91,7 @@
       </div>
       <div class="col-md-9 right">
       <h2>Admin bookshop</h2>
+      <router-view name="Test">wqewqe</router-view>
       <button @click="test()" class="test">TEST</button>
 
       <div class="content">
@@ -99,6 +101,7 @@
         </div>
         <div v-if="content == 'editBook'">
           <edit-book-section :idBook="editBook"></edit-book-section>
+          
         </div>
         <div v-if="content == 'addBook'">
           <add-book-section></add-book-section>
@@ -120,6 +123,7 @@
 import AdminOrders from './AdminOrders'
 import AddBook from './AddBook'
 import EditBook from './EditBook'
+import Test from './Test'
 export default {
   name: 'Admin',
   data () {
@@ -149,6 +153,7 @@ export default {
     'orders-section': AdminOrders,
     'add-book-section':AddBook,
     'edit-book-section':EditBook,
+    'test-section':Test,
   },
   created(){
     this.getUserData()
