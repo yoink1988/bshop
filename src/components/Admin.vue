@@ -50,15 +50,15 @@
       <div class="books">
         Books:
         <div>
-          <button class="new-book">Add Book</button>
+          <button @click="showAddBook()" class="new-book">Add Book</button>
         </div>
-          <p><select class="books">
+          <p><select v-model="editBook" class="books">
             <option value="" class="default">Select Book</option>
             <option v-for="book in books" :value="book.id">{{book.title}}</option>
           </select> 
           
-          <button class="book-edit">Edit</button>
-          <button class="book-del">Delete</button>
+          <button @click="showEditBook()" class="book-edit">Edit</button>
+          <!-- <button class="book-del">Delete</button> -->
           </p>
           <div class="book-msg">
             {{bookMsg}}
@@ -66,29 +66,49 @@
       </div>
 
       <div class="users">
-        <span type="button" class="btn btn-secondary" @click="showUsers()">Show Users</span>
+        Users:
+        <div class="new-user">
+          <button class="add-user">Add User</button>
+        </div>
+        <div class="edit">
+          <select v-model="editUser" name="" id="" class="sel-users">
+          <option value="" class="default">Select User</option>
+          <option v-for="user in users" :value="user.id" >{{user.name}}</option>
+          </select>
+          <button @click="showUserDetails()" class="edit-user">Edit User</button>
+        </div>
+
       </div>
 
       <div class="orders">
-       <a href="#" @click="showOrders()" >Show Orders</a>
+
+          <button @click="showOrders()" class="view-orders">View Orders</button>
+
       </div>
 
      
       </div>
       <div class="col-md-9 right">
       <h2>Admin bookshop</h2>
+      <button @click="test()" class="test">TEST</button>
 
       <div class="content">
         {{errMsg}}
         <div v-if="content == 'users'">
           USERS
         </div>
+        <div v-if="content == 'editBook'">
+          <edit-book-section :idBook="editBook"></edit-book-section>
+        </div>
+        <div v-if="content == 'addBook'">
+          <add-book-section></add-book-section>
+        </div>
         <div v-if="content == 'orders'">
           ORDERS
+          <orders-section ></orders-section>
         </div>
       </div>
 
-      <button @click="test()" class="test">TEST</button>
       </div>
 
       </div>
@@ -97,6 +117,9 @@
 </template>
 
 <script>
+import AdminOrders from './AdminOrders'
+import AddBook from './AddBook'
+import EditBook from './EditBook'
 export default {
   name: 'Admin',
   data () {
@@ -117,8 +140,15 @@ export default {
       genreMsg:'',
       bookMsg:'',
       errMsg:'',
-      content:''
+      content:'',
+      editUser:'',
+      editBook:'',
     }
+  },
+  components:{
+    'orders-section': AdminOrders,
+    'add-book-section':AddBook,
+    'edit-book-section':EditBook,
   },
   created(){
     this.getUserData()
@@ -126,6 +156,7 @@ export default {
     this.getAuthors()
     this.getGenres()
     this.getBooks()
+    this.getUsers()
 
   },
   methods:{
@@ -210,7 +241,7 @@ export default {
     getBooks: function(){
       var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', getUrl()+'books/', true)
+        xhr.open('GET', getUrl()+'books/status/all', true)
         xhr.send();
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
@@ -218,7 +249,6 @@ export default {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
                 self.books = JSON.parse(xhr.responseText)
-                // console.log(self.books)
               }
         }
     },
@@ -376,9 +406,8 @@ export default {
             self.genreMsg = 'Select an Author'      
         }
     },
-    showUsers: function(){
+    getUsers: function(){
        var self = this
-       self.content = 'users'
         var xhr = new XMLHttpRequest()
         xhr.open('GET', getUrl()+'users/', true)
         xhr.send();
@@ -399,14 +428,38 @@ export default {
         }     
     },
     showOrders: function(){
-
-    }
+      var self = this
+        self.content = 'orders'
+    },
+    showAddBook: function(){
+      var self = this
+      self.content = 'addBook'
+    },
+    showEditBook: function(){
+      var self = this
+      if(self.editBook){
+        self.content = 'editBook'
+      }
+    },
 
   },
 
 
   computed:{
-
+    getBookToEdit(){
+      var self = this
+      if(self.EditBook){
+        var book = []
+        var id = self.EditBook
+        self.books.forEach(function(el) {
+          if(el.id == id){
+            book.push(el)
+          }
+        });
+        console.log(book)
+        return book
+      }
+    }
   }
   
   

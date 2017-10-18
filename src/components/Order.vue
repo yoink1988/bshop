@@ -9,30 +9,6 @@
         <td>{{order.date}}</td>
       </tr>
     </table>
-
-
-  <div class="tbl">
-
-    <div @click="alert(1)" class="trow" >
-      <div class="tcol">sssssssssss</div>
-      <div class="tcol">sssssssssssssssss</div>
-
-    </div>
-  </div>
-
-
-
-
-    <div class="trow">
-      <div class="tcol">dddddddddddddd</div>
-      <div class="tcol">ddddddddddddddd</div>
-    </div>
-    
-    <div class="trow">
-      <div class="tcol">aaaaaaaaaaa</div>
-      <div class="tcol">aaaaaaaaaaaaaaaaa</div>
-    </div>
-  
   </div>
 
   </div>
