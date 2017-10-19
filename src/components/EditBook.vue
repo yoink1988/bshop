@@ -8,8 +8,8 @@
         <p>Decription: <textarea v-model="book.description" name="desc" id="" cols="30" rows="10"></textarea></p>
         <p>Book Price: <input v-model="book.price" pattern="[0-9]+" name="price" type="text"/></p>
         <p>Book discount: <input v-model="book.discount" name="discount" type="text"/></p>
-        <p>Book status: <span v-if="book.status">Active</span>
-                        <span v-else><b>Not active</b></span>
+        <p>Book status: <span v-if="bookStatus">Active</span>
+                        <span v-if="!bookStatus"><b>Not active</b></span>
         <button @click="changeBookStatus()">Change</button></p>
         <!-- <p>Book status: <input v-model="book.status" name="status" type="text"/><button @click="changeStatus()">Change</button></p> -->
         <p>Remove Authors: <select v-model="authorsToDelete" multiple size="5" name="" id="">
@@ -48,6 +48,7 @@ export default {
       authorsToAdd:[],
       genresToDelete:[],
       genresToAdd:[],
+      bookStatus: true
     }
   },
   created(){
@@ -98,7 +99,7 @@ export default {
                 self.book = JSON.parse(xhr.responseText)[0]
                 self.bookGenres = self.book.genres
                 self.bookAuthors = self.book.authors
-                // console.log(self.bookGenres)
+                self.bookStatus = !!+self.book.status
               }
         }
     },
@@ -132,7 +133,7 @@ export default {
       // console.log(self.book.discount)
       // console.log(self.book.status)
       // console.log(self.authorsToDelete)
-      console.log(self.authorsToAdd)
+      // console.log(self.authorsToAdd)
       // console.log(self.genresToDelete)
       // console.log(self.genresToAdd)
       // console.log(self.genresToAdd.length)
@@ -147,7 +148,7 @@ export default {
             description : self.book.description,
             price : self.book.price,
             discount : self.book.discount,
-            status : self.book.status,
+            status : self.bookStatus,
           },
           authToDel: self.authorsToDelete,
           authToAdd: self.authorsToAdd,
@@ -162,7 +163,6 @@ export default {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
                           console.log(xhr.responseText)
-                        // self.authMsg = JSON.parse(xhr.responseText)
                     }
               }
             xhr.send(json)
@@ -171,8 +171,8 @@ export default {
     },
     changeBookStatus: function(){
       var self = this
-      self.book.status = !self.book.status
-      console.log(self.book.status)
+      self.bookStatus = !self.bookStatus
+      console.log(self.bookStatus)
     },
     validForm: function(){
       var self = this
@@ -190,8 +190,7 @@ export default {
 
 
 
-  }
-
+  },
 }
 </script>
 

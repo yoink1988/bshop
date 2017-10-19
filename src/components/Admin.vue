@@ -69,14 +69,14 @@
       <div class="users">
         Users:
         <div class="new-user">
-          <button class="add-user">Add User</button>
+          <router-link to="/admin/adduser/"><button class="add-user">Add User</button></router-link>
         </div>
         <div class="edit">
           <select v-model="editUser" name="" id="" class="sel-users">
           <option value="" class="default">Select User</option>
           <option v-for="user in users" :value="user.id" >{{user.name}}</option>
           </select>
-          <button @click="showUserDetails()" class="edit-user">Edit User</button>
+          <button @click="showEditUserDetails()" class="edit-user">Edit User</button>
         </div>
 
       </div>
@@ -91,8 +91,8 @@
       </div>
       <div class="col-md-9 right">
       <h2>Admin bookshop</h2>
-      <router-view name="Test">wqewqe</router-view>
-      <button @click="test()" class="test">TEST</button>
+      <router-view></router-view>
+      <!-- <button @click="test()" class="test">TEST</button> -->
 
       <div class="content">
         {{errMsg}}
@@ -124,6 +124,8 @@ import AdminOrders from './AdminOrders'
 import AddBook from './AddBook'
 import EditBook from './EditBook'
 import Test from './Test'
+import Register from './Register'
+import EditUser from './EditUser'
 export default {
   name: 'Admin',
   data () {
@@ -444,6 +446,12 @@ export default {
       var self = this
       if(self.editBook){
         self.content = 'editBook'
+      }
+    },
+    showEditUserDetails: function(){
+      var self = this
+      if(self.editUser){
+        self.$router.push({ path: '/admin/edituser/'+self.editUser})
       }
     },
 

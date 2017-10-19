@@ -5,6 +5,7 @@ import Register from '@/components/Register'
 // import Book from '@/components/Book'
 import Admin from '@/components/Admin'
 import Test from '@/components/Test'
+import EditUser from '@/components/EditUser'
 
 Vue.use(Router)
 
@@ -20,15 +21,16 @@ export default new Router({
       name: 'Register',
       component: Register
     },
-    {
-      path: '/admin/test/',
-      name: 'Test',
-      component: Test
-    },
+
     {
       path: '/admin/',
       name: 'Admin',
-      component: Admin
+      component: Admin,
+      children: [
+        { path: 'test', component: Test },
+        { path: 'adduser', component: Register },
+        { path: 'edituser/:id', component: EditUser },
+      ]
     }
 
   ]

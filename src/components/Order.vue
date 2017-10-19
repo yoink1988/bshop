@@ -29,6 +29,7 @@ export default {
   methods:{
     getOrders: function(){
         var self = this
+        console.log(self.user.id)
         var xhr = new XMLHttpRequest()
         xhr.open('GET', getUrl()+'orders/'+self.user.id, true)
           xhr.onreadystatechange = function() {
@@ -40,7 +41,7 @@ export default {
                 var res = JSON.parse(xhr.responseText)
                 if(typeof(res) == 'string'){
                   self.msg = res
-                  self.booksInCart =''
+                  // self.booksInCart =''
                 }
                 else{
                   self.orders = JSON.parse(xhr.responseText)
