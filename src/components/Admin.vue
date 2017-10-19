@@ -76,7 +76,8 @@
           <option value="" class="default">Select User</option>
           <option v-for="user in users" :value="user.id" >{{user.name}}</option>
           </select>
-          <button @click="showEditUserDetails()" class="edit-user">Edit User</button>
+          <button @click="showEditUs
+          erDetails()" class="edit-user">Edit User</button>
         </div>
 
       </div>

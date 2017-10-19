@@ -12,6 +12,11 @@
       <p>Status: {{StatusString}} <button @click="changeStatus()" >Change</button></p>
       <p><button @click="save()">Save</button></p>
     </div>
+
+    <div class="user-orders">
+
+    </div>
+
    </div>
 </template>
 
@@ -75,6 +80,28 @@ export default {
               }
             xhr.send(json)
 
+    },
+        getOrders: function(){
+        var self = this
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', getUrl()+'orders/'+this.$route.params.id, true)
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return
+              if (xhr.status != 200) {
+                alert(xhr.status + ': ' + xhr.statusText)
+              } else {
+                console.log(JSON.parse(xhr.responseText))
+                var res = JSON.parse(xhr.responseText)
+                if(typeof(res) == 'string'){
+                  self.msg = res
+                }
+                else{
+                  self.userData.orders = JSON.parse(xhr.responseText)
+                }
+
+              }
+        }
+        xhr.send();
     },
 
   },
