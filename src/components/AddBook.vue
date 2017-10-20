@@ -76,10 +76,6 @@ export default {
       var self = this
       if(self.validForm()){
       var xhr = new XMLHttpRequest();
-      // var authors = []
-      // self.selectedAuthors.forEach(function(el) {
-      //  authors.push({id:el}) 
-      // });
       var json = JSON.stringify({
          book: {
            title: self.title,

@@ -13,7 +13,7 @@
            <p><router-link :to="'/register/'">Registration</router-link></p>
           </div>
           <div v-else class="logged">
-            <p><a href="#" @click="logOut()">Log Out</a></p>
+           <p><a href="#" @click="logOut()">Log Out</a></p>
            <p><a href="#" @click="showCart()">Cart</a></p>
            <p><a href="#" @click="showOrders()">My Orders</a></p>
           <div v-if="user.role == 'admin'" class="admin">
@@ -46,23 +46,18 @@
 
       </div>
       <div class="col-md-10 right">
-              <h2>Book Shop</h2>
 
-        <div v-if="ordered">
-          Thank You!
-        </div>
-
-        <div v-if="orders">
+        <div v-if="content == 'orders'">
           <order-section :user="user"></order-section>
         </div>
 
-        <div v-if="selectedBook">
+        <div v-if="content == 'book'">
         <book-section :book="selectedBook" :user="user"></book-section>        
          </div>
-         <div v-if="cart">
+         <div v-if="content == 'cart'">
            <cart-section :user="user"></cart-section>
          </div>
-      <div v-if="allBooks">
+      <div v-if="content == ''">
         <div class="books-section col-md-10">
           <table>
           <tr><td class="title"><b>Title</b></td>
@@ -104,10 +99,7 @@ export default {
   name: 'Home',
   data () {
     return {
-      orders: false,
-      ordered: false,
-      allBooks:true,
-      cart:'',
+      content: '',
       selectedBook:'',
       user:{},
       logMsg: '',
@@ -140,7 +132,6 @@ export default {
       self.clearInputs()
           xhr.open("PUT", getUrl()+'auth/', true)
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-          // xhr.withCredentials = true;
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
@@ -168,9 +159,7 @@ export default {
       showBookInfo: function(book){
         var self = this
         self.selectedBook = book
-        self.allBooks = ''
-        self.cart = false
-        self.ordered = false
+        self.content = 'book'
       },
     getAuthors: function(){
       var self = this
@@ -219,21 +208,15 @@ export default {
     },
     setFilter: function(type, id){
       var self = this
-      self.selectedBook = ''
       self.filter.type = type
       self.filter.id = id
       self.refreshed = false
-      self.allBooks = true
-      self.cart = false
-      self.ordered = false
-      self.orders = false
+      self.content = ''
+
     },
         logOut: function(){
         var self = this
-        self.ordered = false
         self.user = {}
-        self.cart = false
-        self.allBooks = true       
         delete localStorage['user']
         self.getUserData()
         self.checkAuth()
@@ -261,14 +244,20 @@ export default {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
                         // alert(xhr.status + ': ' + xhr.statusText)
-                        self.user.name = 'Guest'
-                        self.user.role = 'guest'
+                       if(xhr.status == 401){
                         self.user.id = '0'
                         self.user.hash = '0'
-                  } else {
+                        
+                       }
+                  } else if(JSON.parse(xhr.responseText) != 'NE ZALOGINEN'){
                     self.user = JSON.parse(xhr.responseText)[0]
                     localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
-                  }
+                    }
+                    else{
+                        self.user.id = '0'
+                        self.user.hash = '0'
+                    }
+                  
             }
           xhr.send()        
 
@@ -280,21 +269,12 @@ export default {
     },
     showCart: function(){
       var self = this
-      self.selectedBook = ''
-      self.allBooks = false
-      self.refreshed = false
-      self.ordered = false
-      self.orders = false
-      self.cart = true
+      self.content = 'cart'
+
     },
     showOrders: function(){
       var self = this
-      self.selectedBook = ''
-      self.allBooks = false
-      self.refreshed = false
-      self.ordered = false
-      self.cart = false
-      self.orders = true
+      self.content = 'orders'
     }
 
   },
@@ -394,5 +374,13 @@ th{
 
 table{
   margin-top: 40px;
+}
+
+.left{
+  /* width: 400px; */
+  background-color: #f0bd86;
+}
+.right{
+  /* background-color: #f0bc86; */
 }
 </style>

@@ -6,6 +6,11 @@ import Register from '@/components/Register'
 import Admin from '@/components/Admin'
 import Test from '@/components/Test'
 import EditUser from '@/components/EditUser'
+import EditBook from '@/components/EditBook'
+import AdminOrders from '@/components/AdminOrders'
+import AddBook from '@/components/AddBook'
+import TY from '@/components/TY'
+
 
 Vue.use(Router)
 
@@ -21,6 +26,11 @@ export default new Router({
       name: 'Register',
       component: Register
     },
+    {
+      path: '/thankyou/',
+      name: 'TY',
+      component: TY
+    },
 
     {
       path: '/admin/',
@@ -30,6 +40,9 @@ export default new Router({
         { path: 'test', component: Test },
         { path: 'adduser', component: Register },
         { path: 'edituser/:id', component: EditUser },
+        { path: 'editbook/:id', component: EditBook },
+        { path: 'orders', component: AdminOrders },
+        { path: 'addbook', component: AddBook },
       ]
     }
 

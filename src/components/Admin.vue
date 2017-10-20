@@ -3,7 +3,7 @@
     
         <div class="row">
       <div class="col-md-3 left">
-        <router-link to="/admin/test/">qwewqe</router-link>
+        <!-- <router-link to="/admin/test/">qwewqe</router-link> -->
         <div class="authors">
           Authors:
           <div class="new-author">
@@ -51,15 +51,17 @@
       <div class="books">
         Books:
         <div>
-          <button @click="showAddBook()" class="new-book">Add Book</button>
+          <router-link to="/admin/addbook/"><button class="add-user">Add Book</button></router-link>
+          <!-- <button @click="showAddBook()" class="new-book">Add Book</button> -->
         </div>
           <p><select v-model="editBook" class="books">
             <option value="" class="default">Select Book</option>
             <option v-for="book in books" :value="book.id">{{book.title}}</option>
           </select> 
           
-          <button @click="showEditBook()" class="book-edit">Edit</button>
-          <!-- <button class="book-del">Delete</button> -->
+          <!-- <button @click="showEditBook()" class="book-edit">Edit</button> -->
+          <button @click="showEditBook()" >Edit</button>
+
           </p>
           <div class="book-msg">
             {{bookMsg}}
@@ -76,8 +78,7 @@
           <option value="" class="default">Select User</option>
           <option v-for="user in users" :value="user.id" >{{user.name}}</option>
           </select>
-          <button @click="showEditUs
-          erDetails()" class="edit-user">Edit User</button>
+          <button @click="showEditUserDetails()" class="edit-user">Edit User</button>
         </div>
 
       </div>
@@ -93,24 +94,22 @@
       <div class="col-md-9 right">
       <h2>Admin bookshop</h2>
       <router-view></router-view>
-      <!-- <button @click="test()" class="test">TEST</button> -->
-
-      <div class="content">
-        {{errMsg}}
-        <div v-if="content == 'users'">
+      <!-- <div class="content"> -->
+        <!-- {{errMsg}} -->
+        <!-- <div v-if="content == 'users'">
           USERS
-        </div>
-        <div v-if="content == 'editBook'">
-          <edit-book-section :idBook="editBook"></edit-book-section>
-          
-        </div>
-        <div v-if="content == 'addBook'">
-          <add-book-section></add-book-section>
+        </div> -->
+        <!-- <div v-if="content == 'editBook'">
+          <!-- <edit-book-section :idBook="editBook"></edit-book-section> -->
+<!--           
+        </div> -->
+         <!-- <div v-if="content == 'addBook'"> -->
+          <!-- <add-book-section></add-book-section>
         </div>
         <div v-if="content == 'orders'">
           ORDERS
           <orders-section ></orders-section>
-        </div>
+        </div> --> 
       </div>
 
       </div>
@@ -127,6 +126,7 @@ import EditBook from './EditBook'
 import Test from './Test'
 import Register from './Register'
 import EditUser from './EditUser'
+// import AdminOrders from './AdminOrders'
 export default {
   name: 'Admin',
   data () {
@@ -152,12 +152,6 @@ export default {
       editBook:'',
     }
   },
-  components:{
-    'orders-section': AdminOrders,
-    'add-book-section':AddBook,
-    'edit-book-section':EditBook,
-    'test-section':Test,
-  },
   created(){
     this.getUserData()
     this.checkAuth()
@@ -172,22 +166,24 @@ export default {
       var self = this
 
       var xhr = new XMLHttpRequest();
-          xhr.open("GET", getUrl()+'auth/id/'+self.user.id+'/hash/'+self.user.hash, true)
+          xhr.open("GET", getUrl()+'auth/id/'+self.user.id+'/hash/'+self.user.hash, false)
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
-                         alert(xhr.status + ': ' + xhr.statusText)
+                        //  alert(xhr.status + ': ' + xhr.statusText)
                         self.user.name = 'Guest'
                         self.user.role = 'guest'
                         self.user.id = '0'
                         self.user.hash = '0'
+                        // self.checkRole()
                   } else {
                     self.user = JSON.parse(xhr.responseText)[0]
-                    self.checkRole()
+                    
                     console.log(self.user.role)
                     localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
                   }
+                  self.checkRole()
             }
           xhr.send()        
 
@@ -437,24 +433,36 @@ export default {
     },
     showOrders: function(){
       var self = this
-        self.content = 'orders'
+        self.$router.push({ path: '/admin/orders/'})
     },
     showAddBook: function(){
       var self = this
       self.content = 'addBook'
     },
-    showEditBook: function(){
-      var self = this
-      if(self.editBook){
-        self.content = 'editBook'
-      }
-    },
+    // showEditBook: function(){
+    //   var self = this
+    //   if(self.editBook){
+    //     self.content = 'editBook'
+    //   }
+    // },
     showEditUserDetails: function(){
       var self = this
       if(self.editUser){
         self.$router.push({ path: '/admin/edituser/'+self.editUser})
       }
+      else{
+        self.$router.push({ path: '/admin/'})
+      }  
     },
+    showEditBook: function(){
+      var self = this
+      if(self.editBook){
+        self.$router.push({ path: '/admin/editbook/'+self.editBook})
+      }
+      else{
+        self.$router.push({ path: '/admin/'})
+      }      
+    }
 
   },
 

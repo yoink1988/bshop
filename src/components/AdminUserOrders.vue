@@ -1,5 +1,5 @@
 <template>
-  <div class="orders">
+    <div class="user-orders">
       <div class="or-rowhead">      
         <div class="or-cell2">
           Order ID
@@ -13,7 +13,7 @@
         <div class="or-cell4">
           User login
         </div>
-        <div class="or-cell3">
+        <div class="or-cell2">
           User discount
         </div>
         <div class="or-cell4">
@@ -123,13 +123,17 @@
       </div>
   </div>
 </div>
+
 </template>
 
 <script>
 export default {
-  name: 'Orders',
+  name: 'OrdersOfUser',
+  props:['id'],
   data () {
     return {
+      userData:'',
+      msg:'',
       orders:'',
       statuses:'',
       refreshed: false
@@ -143,7 +147,7 @@ export default {
     getOrders: function(){
         var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', getUrl()+'orders/', true)
+        xhr.open('GET', getUrl()+'orders/'+self.id, true)
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
               if (xhr.status != 200) {
@@ -261,7 +265,6 @@ export default {
                     }
               }
             xhr.send(json)
-
     },
   
     
@@ -277,11 +280,6 @@ export default {
       return arr
     }
   }
-  
-  
-
-
-
 }
 </script>
 
@@ -292,43 +290,6 @@ h1, h2 {
   /* padding: 30px; */
 }
 
-
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-td{
-  padding:10px;
-}
-
-th{
-  padding:20px;
-}
-
-table{
-  margin-top: 40px;
-}
-
-
-.cart .save-msg{
-  text-align: left;
-}
-
-a {
-  color: #42b983;
-  text-decoration: none;
-}
-
-.or-tbl{
-  display: table;
-}
 .or-row{
   display: table-row;
   padding-top: 10px;
@@ -404,5 +365,7 @@ a {
     padding: 5px 5px;
       width: 120px;
 }
-
+a {
+  color: #42b983;
+}
 </style>

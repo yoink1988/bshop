@@ -1,5 +1,5 @@
 <template>
-  <div class="add-book">
+  <div class="edit-book">
     <h4>Edit Book</h4>
     <h4>{{book.title}}</h4>
     
@@ -27,7 +27,7 @@
 
         <p><button @click="save()" class="test">Save</button></p>
         <p>{{errMsg}}</p>
-        <button @click="test_diff()" class="test">TEST</button>
+        <button @click="test()" class="test">TEST</button>
       </div>
   </div>
 </template>
@@ -35,7 +35,11 @@
 <script>
 export default {
   name: 'EditBook',
-  props: ['idBook'],
+      beforeRouteUpdate(to, from, next) {
+        this.getBooks(to.params.id)
+        this.showOrdrers = false
+        next()
+    },
   data () {
     return {
       authors:'',
@@ -54,8 +58,7 @@ export default {
   created(){
     this.getGenres()
     this.getAuthors()
-    this.getBooks()
-    // console.log(this.book.genres)
+    this.getBooks(this.$route.params.id)
   },
   methods:{
     getAuthors: function(){
@@ -86,10 +89,10 @@ export default {
               }
         }
     },
-        getBooks: function(){
-      var self = this
+        getBooks: function(id){
+        var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', getUrl()+'books/id/'+self.idBook+'/status/all', true)
+        xhr.open('GET', getUrl()+'books/id/'+id+'/status/all', true)
         xhr.send();
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
@@ -105,7 +108,7 @@ export default {
     },
     test: function(){
       var self = this
-      console.log(self.selectedAuthors)
+      console.log(self.$root)
     },
     diff: function(a, b){
 
@@ -127,19 +130,7 @@ export default {
     save: function(){
       var self = this
       self.errMsg = ''
-      // console.log(self.book.title)
-      // console.log(self.book.description)
-      // console.log(self.book.price)
-      // console.log(self.book.discount)
-      // console.log(self.book.status)
-      // console.log(self.authorsToDelete)
-      // console.log(self.authorsToAdd)
-      // console.log(self.genresToDelete)
-      // console.log(self.genresToAdd)
-      // console.log(self.genresToAdd.length)
-
       if(self.validForm()){
-
         var xhr = new XMLHttpRequest();
         var json = JSON.stringify({
           book:{
@@ -162,6 +153,7 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
+                            self.getBooks(self.book.id)
                           console.log(xhr.responseText)
                     }
               }

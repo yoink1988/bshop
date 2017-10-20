@@ -1,13 +1,7 @@
 <template>
   <div class="cart">
-    <div v-if="showCart" class="cartt">
+    <div v-if="content == 'cart'" class="cartt">
     <h4>Cart</h4>
-
-    <div v-if="thankYou !=''" class="thanks">
-      <h4>qweqweqwewqeqweqw</h4>
-    </div>
-    <div v-else></div>
-
     <div v-if="booksInCart">
       <span>Your discount: {{user.discount}} %</span>
       <table>
@@ -44,7 +38,7 @@
           </td>
 
         </tr>
-        <tr><td>{{saveMsg}}</td><td><button @click="refresh()" class="save">Refresh</button></td></tr>
+        <tr><td>{{saveMsg}}</td><td><button @click="refresh()" class="save">Apply Changes</button></td></tr>
         <tr><td>Total price:{{totalPrice}} $</td></tr>
         <tr><td>Total price with your discount:{{totalWithUserDiscount }} $</td><td><button @click="goCheckOut()" class="checkout">Check out</button></td></tr>
       </table>
@@ -53,19 +47,17 @@
     <div v-else>
       {{msg}}
     </div>
-   </div>
-
-   <div style="width:500px;margin:auto"  v-if="showCheckOut" class="checkout">
-     <h4>CheckOut</h4>
-     <!-- <form action=""> -->
-     <div style="text-align:left;" class="inp" v-for="(payMeth, index) in payment" :key="payMeth.id">
-        <input v-model="checkedPayment" name="id_payment" :value="payMeth.id" type="radio">{{payMeth.name}}</input>
+    </div>
+     <div v-if="content == 'checkout'" style="width:300px;margin: 60px auto;background:grey;padding:10px"  class="checkout">
+       <div style="width:200px;margin: auto;padding:20px">
+        <div style="text-align:left" v-for="(payMeth, index) in payment" :key="payMeth.id" class="form-check">
+            <input  v-model="checkedPayment" name="id_payment" :value="payMeth.id"  class="form-check-input" type="radio" id="gridRadios2" >
+            {{payMeth.name}}</input>
+        </div>    
+       </div>
+     <button  @click="addOrder()"class="btn btn-light">Add Order</button>
+     <button @click="goCart()" class="btn btn-light">Back to Cart</button>
      </div>
-      <!-- </form> -->
-      
-     <button @click="addOrder()" class="back">Add Order</button>
-     <button @click="goCart()" class="back">Back to Cart</button>
-  
     </div>
   </div>
 </template>
@@ -84,11 +76,10 @@ export default {
       msg: '',
       booksInCart:'',
       payment:'',
-      // ordered:false
+      content: 'cart'
     }
   },
   created(){
-    // console.log(this.user.role)
     this.getBooksFromCart()
     this.getPayment()
   },
@@ -112,7 +103,6 @@ export default {
                     el.checkbox = false
                   })
                   self.booksInCart = res
-                  // console.log(self.booksInCart)
                 }
               }
         }
@@ -121,9 +111,11 @@ export default {
     plus: function(index){
       var self = this
       self.booksInCart[index].count++
+      self.saveMsg = 'Not Aplyed'
     },
     minus: function(index){
       var self = this
+      self.saveMsg = 'Not Aplyed'
       if(self.booksInCart[index].count > 1)
       {
         self.booksInCart[index].count--
@@ -170,8 +162,8 @@ export default {
     },
     goCheckOut: function(){
       var self = this
-      self.showCart = false
-      self.showCheckOut = true
+      self.content = 'checkout'
+      self.getBooksFromCart()
       self.getPayment()
     },
     getPayment: function(){
@@ -201,8 +193,8 @@ export default {
     },
     goCart: function(){
       var self = this
-      self.showCart = true
-      self.showCheckOut = false      
+      self.content = 'cart'
+   
     },
     addOrder:function(){
       var self = this
@@ -211,7 +203,6 @@ export default {
       if(payment){
         var order = [{'id_user':self.user.id, 'id_payment':payment, 'disc_user':self.user.discount}]
         var orderInfo = []
-        // var data
         books.forEach(function(el){
         orderInfo.push({'id_book':el.id, 'count': el.count, 'price':el.price, 'disc_book':el.discount})
         })
@@ -226,13 +217,9 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-
                     console.log(xhr.responseText)
                     self.clearCart()
-
-                    self.showCheckOut = false
-                    // self.msg = JSON.parse(xhr.responseText)
-                    // self.count = ''
+                    self.$router.push({ path: '/thankyou/'})
                   }
             }
           xhr.send(json)
@@ -287,7 +274,7 @@ export default {
       else{
         disc = '-'
       }
-      return disc
+      return disc.toFixed(2)
     },
 
   }

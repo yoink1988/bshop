@@ -9,7 +9,7 @@ export default {
   name: 'app',
   data(){
     return{
-      
+      data:'wqqqqqqqqqqqqqqqqqqqq'
     }
   },
   created(){
@@ -33,14 +33,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  background-color: lemonchiffon;
-  /* margin-top: 60px; */
+  /* background-color: #f0bc86; */
+  margin: 0 auto;
+  /* width: 1000px; */
 }
-.left{
-  background-color: lightgray;
-}
-.right{
-  background-color: lemonchiffon;
+
+body{
+    background-color: #fac287;
 }
 
 /* .menu{

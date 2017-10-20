@@ -13,38 +13,48 @@
       <p><button @click="save()">Save</button></p>
     </div>
 
-    <div class="user-orders">
-
-    </div>
+        <button @click="showUserOrders()" >Show Orders</button>
+        <div v-if="showOrdrers">
+          <user-orders :id="userData.id"></user-orders>
+        </div>
 
    </div>
 </template>
 
 <script>
+import AdminUserOrders from './AdminUserOrders'
 export default {
   name: 'EditUser',
+      beforeRouteUpdate(to, from, next) {
+        this.getUser(to.params.id)
+        this.showOrdrers = false
+        next()
+    },
   data () {
     return {
       user:'',
       userData:'',
-      msg:''
+      msg:'',
+      showOrdrers: false,
+      uId:''
     }
   },
   created(){
-    this.getUser()
+    this.getUser(this.$route.params.id)
+    this.uId = this.$route.params.id
   },
+  
   methods:{
-    getUser: function(){
-
+    getUser: function(id){
         var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', getUrl()+'users/'+this.$route.params.id, true)
+        xhr.open('GET', getUrl()+'users/'+id, true)
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                console.log(JSON.parse(xhr.responseText)[0])
+                // console.log(JSON.parse(xhr.responseText)[0])
                 var res = JSON.parse(xhr.responseText)
                 if(typeof(res) == 'string'){
                   self.msg = res
@@ -74,7 +84,7 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
-                            console.log(xhr.responseText)
+                            // console.log(xhr.responseText)
                             // self.getOrders()
                     }
               }
@@ -84,13 +94,13 @@ export default {
         getOrders: function(){
         var self = this
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', getUrl()+'orders/'+this.$route.params.id, true)
+        xhr.open('GET', getUrl()+'orders/'+self.userData.id, true)
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                console.log(JSON.parse(xhr.responseText))
+                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
                 if(typeof(res) == 'string'){
                   self.msg = res
@@ -103,6 +113,10 @@ export default {
         }
         xhr.send();
     },
+    showUserOrders: function(){
+      var self = this
+      self.showOrdrers = !self.showOrdrers
+    }
 
   },
   computed:{
@@ -112,7 +126,20 @@ export default {
         return 'Active'
       }
       return 'Inactive'
+    },
+
+    Data(){
+      var self = this
+      if(self.$route.params.id != self.uId){
+        // self.getUser()
+        console.log(self.$route.params.id)
+        console.log(self.userData.id)
+      }
     }
+
+  },
+  components:{
+    'user-orders': AdminUserOrders
   }
 
 }
