@@ -3,25 +3,30 @@
     <div class="row">
       <div class="col-md-2 left">
         <div class="row menu">
-          <p><b>Welcome {{user.name}}</b></p>
-          <div v-if="user.name == ''" class="log-form">
-            <p>Log In</p>
-            <p>Email:<input v-model="login.email" type="text"></p>
-            <p>Password:<input v-model="login.pass" type="text"></p>
-            {{logMsg}}
-            <button @click="signIn" class="login">Log In</button>
-           <p><router-link :to="'/register/'">Registration</router-link></p>
-          </div>
-          <div v-else class="logged">
-           <p><a href="#" @click="logOut()">Log Out</a></p>
-           <p><a href="#" @click="showCart()">Cart</a></p>
-           <p><a href="#" @click="showOrders()">My Orders</a></p>
-          <div v-if="user.role == 'admin'" class="admin">
-            <p><router-link :to="'/admin/'" :role="user.role">Admin Panel</router-link></p>
-          </div>
-          </div>
+          <div class="col" style="margin:20px auto">
+            <p><b>Welcome {{user.name}}</b></p>
+            <div v-if="user.name == ''" class="log-form">
+              <p>Log In</p>
+              <p>Email:<input v-model="login.email" type="text"></p>
+              <p>Password:<input v-model="login.pass" type="text"></p>
+              {{logMsg}}
+              <button @click="signIn" class="login">Log In</button>
+            <p><router-link :to="'/register/'">Registration</router-link></p>
+            </div>
+            <div v-else class="logged">
+            <p><a href="#" @click="logOut()">Log Out</a></p>
+            <p><a href="#" @click="showCart()">Cart</a></p>
+            <p><a href="#" @click="showOrders()">My Orders</a></p>
 
+            <div v-if="user.role == 'admin'" class="admin">
+              <p><router-link :to="'/admin/'" :role="user.role">Admin Panel</router-link></p>
+            </div>
+
+            </div>
+          </div>
         </div>
+
+
         <div class="showbooks">
           <h4><a  href="#" @click="setFilter('','')" >Show All books</a></h4>
         </div>
@@ -45,48 +50,62 @@
         </div>
 
       </div>
-      <div class="col-md-10 right">
 
+      <div class="col-md-10 right">
+          <div class="row">
         <div v-if="content == 'orders'">
           <order-section :user="user"></order-section>
         </div>
 
         <div v-if="content == 'book'">
         <book-section :book="selectedBook" :user="user"></book-section>        
-         </div>
+        </div>
          <div v-if="content == 'cart'">
            <cart-section :user="user"></cart-section>
          </div>
-      <div v-if="content == ''">
-        <div class="books-section col-md-10">
-          <table>
-          <tr><td class="title"><b>Title</b></td>
-          <td class="description"><b>Description</b></td>
-          <td class="price"><b>Price</b></td>
-          <td class="price"><b>Authors</b></td>
-          <td class="price"><b>Genres</b></td>
-          <td class="discount"><b>Discount</b></td>
-          <td class="discount"><b>Discounted price</b></td></tr>
-          <tr v-for = "book, key in filteredBooks">
-          <td class="title"><a href="#" @click="showBookInfo(book)">{{book.title}}</a></td>
-          <td class="description">{{book.description}}</td>
-          <td class="price">{{book.price}} $</td>
-          <td>
-            <p v-for = "author in book.authors"><a  href="#" @click="setFilter('author', author.id)" >{{author.name}}</a></p>
-          </td>
-          <td>
-            <p v-for = "genre in book.genres"><a  href="#" @click="setFilter('genre', genre.id)" >{{genre.name}}</a></p>
-          </td>
-          <td class="discount">{{book.discount}} %</td>
-          <td class="discounted">{{(book.price - book.price*book.discount/100).toFixed(2)}} $</td>
-            </tr>
-            </table>
 
-        </div>  
+      <div v-if="content == ''" class="col">
+        <!-- <div> -->
+          <table>
+          <tr class="row">
+          <td class="col-md-1"><b>Title</b></td>
+          <td class="col-md-5"><b>Description</b></td>
+          <td class="col-md-1"><b>Price</b></td>
+          <td class="col-md-1"><b>Authors</b></td>
+          <td class="col-md-2"><b>Genres</b></td>
+          <td class="col-md-1"><b>Discount</b></td>
+          <td class="col-md-1"><b>Discounted price</b></td></tr>
+
+          <tr class="row" v-for = "book, key in filteredBooks">
+          <td class="col-md-1"><a href="#" @click="showBookInfo(book)">{{book.title}}</a></td>
+          <td class="col-md-5">{{book.description}}</td>
+          <td class="col-md-1">{{book.price}} $</td>
+          <td class="col-md-1">
+            <span v-for = "author in book.authors">
+               <a  href="#" @click="setFilter('author', author.id)" > 
+              {{author.name}} 
+              </a>
+              </span>
+          </td>
+          <td class="col-md-2">
+            <span v-for = "genre in book.genres">
+              <a  href="#" @click="setFilter('genre', genre.id)" > 
+                {{genre.name}} 
+                </a>
+                </span>
+          </td>
+          <td class="col-md-1">{{book.discount}} %</td>
+          <td class="col-md-1">{{(book.price - book.price*book.discount/100).toFixed(2)}} $</td>
+             </tr> 
+
+            </table>
+        <!-- </div> -->
       </div>
+</div>
 
       </div>
     </div>
+
   </div>
 </template>
 
@@ -344,9 +363,6 @@ h1, h2 {
   font-weight: normal;
 }
 
-/* .books-section{
-  margin: left 10%;
-} */
 
 ul {
   list-style-type: none;
@@ -362,12 +378,12 @@ a {
   color: #42b983;
 }
 
-td{
+/* td{
   padding:20px;
 }
 th{
   padding:20px;
-}
+} */
 .logged{
   height: 200px;
 }
@@ -383,4 +399,6 @@ table{
 .right{
   /* background-color: #f0bc86; */
 }
+
+
 </style>

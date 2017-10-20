@@ -3,6 +3,7 @@
     
         <div class="row">
       <div class="col-md-3 left">
+        <router-link to="/">Home</router-link>
         <!-- <router-link to="/admin/test/">qwewqe</router-link> -->
         <div class="authors">
           Authors:
@@ -94,22 +95,6 @@
       <div class="col-md-9 right">
       <h2>Admin bookshop</h2>
       <router-view></router-view>
-      <!-- <div class="content"> -->
-        <!-- {{errMsg}} -->
-        <!-- <div v-if="content == 'users'">
-          USERS
-        </div> -->
-        <!-- <div v-if="content == 'editBook'">
-          <!-- <edit-book-section :idBook="editBook"></edit-book-section> -->
-<!--           
-        </div> -->
-         <!-- <div v-if="content == 'addBook'"> -->
-          <!-- <add-book-section></add-book-section>
-        </div>
-        <div v-if="content == 'orders'">
-          ORDERS
-          <orders-section ></orders-section>
-        </div> --> 
       </div>
 
       </div>
