@@ -4,51 +4,58 @@
       <div class="col-md-2 left">
         <div class="row menu">
           <div class="col" style="margin:20px auto">
-            <p><b>Welcome {{user.name}}</b></p>
-            <div v-if="user.name == ''" class="log-form">
-              <p>Log In</p>
-              <p>Email:<input v-model="login.email" type="text"></p>
-              <p>Password:<input v-model="login.pass" type="text"></p>
-              {{logMsg}}
-              <button @click="signIn" class="login">Log In</button>
+            <div class="row" style="text-align:center">
+             <b>Welcome {{user.name}}</b>
+            </div>
+            <div class="row" style="margin-top:30px auto;">
+            <div v-if="user.name == ''" class="log-form col">
+
+              <label for="exampleInputPassword1">Login Form</label>
+              <p><label>Email address:</label></p>
+              <input placeholder="Enter email" v-model="login.email" type="text">
+              <label for="exampleInputPassword1">Password:</label>
+              <input placeholder="Password" v-model="login.pass" type="text">
+              
+              <p><button @click="signIn" class="login">Log In</button></p>
+              <p>{{logMsg}}</p>
             <p><router-link :to="'/register/'">Registration</router-link></p>
             </div>
-            <div v-else class="logged">
-            <p><a href="#" @click="logOut()">Log Out</a></p>
-            <p><a href="#" @click="showCart()">Cart</a></p>
-            <p><a href="#" @click="showOrders()">My Orders</a></p>
-
-            <div v-if="user.role == 'admin'" class="admin">
-              <p><router-link :to="'/admin/'" :role="user.role">Admin Panel</router-link></p>
+          
+            <div v-else class="col" style="text-align:center">
+              <p><a href="#" @click="logOut()">Log Out</a></p>
+              <p><a href="#" @click="showCart()">Cart</a></p>
+              <p><a href="#" @click="showOrders()">My Orders</a></p>
+              <div v-if="user.role == 'admin'" class="admin">
+                  <p><router-link :to="'/admin/'" :role="user.role">Admin Panel</router-link></p>
+              </div>
             </div>
-
             </div>
           </div>
         </div>
 
-
-        <div class="showbooks">
-          <h4><a  href="#" @click="setFilter('','')" >Show All books</a></h4>
-        </div>
-        <div class="authors">
-          <h4>Authors:</h4>
-          <div v-for="author in authors">
-            <a  href="#" @click="setFilter('author', author.id)" >{{author.name}}</a>  
+        <div class="row" style="margin: 20px">
+          <div class="showbooks">
+            <h4><a  href="#" @click="setFilter('','')" >Show All books</a></h4>
+          </div>
+          <div class="authors">
+            <h4>Authors:</h4>
+            <div v-for="author in authors">
+              <a  href="#" @click="setFilter('author', author.id)" >{{author.name}}</a>  
+            </div>
+          </div>
+          <div class="genres">
+            <h4>Genres:</h4>
+            <div v-for="genre in genres">
+              <a  href="#" @click="setFilter('genre', genre.id)" >{{genre.name}}</a>  
+            </div>
+          </div>
+          <div class="books">
+            <h4>Books:</h4>
+            <div v-for="book in books">
+              <a href="#" @click="showBookInfo(book)">{{book.title}}</a>  
+            </div>
           </div>
         </div>
-        <div class="genres">
-          <h4>Genres:</h4>
-          <div v-for="genre in genres">
-            <a  href="#" @click="setFilter('genre', genre.id)" >{{genre.name}}</a>  
-          </div>
-        </div>
-        <div class="books">
-          <h4>Books:</h4>
-          <div v-for="book in books">
-            <a href="#" @click="showBookInfo(book)">{{book.title}}</a>  
-          </div>
-        </div>
-
       </div>
 
       <div class="col-md-10 right">
@@ -69,17 +76,17 @@
           <table>
           <tr class="row">
           <td class="col-md-1"><b>Title</b></td>
-          <td class="col-md-5"><b>Description</b></td>
-          <td class="col-md-1"><b>Price</b></td>
+          <td class="col-md-3"><b>Description</b></td>
+          <td class="col-md-2"><b>Price</b></td>
           <td class="col-md-1"><b>Authors</b></td>
           <td class="col-md-2"><b>Genres</b></td>
           <td class="col-md-1"><b>Discount</b></td>
-          <td class="col-md-1"><b>Discounted price</b></td></tr>
+          <td class="col-md-2"><b>Discounted price</b></td></tr>
 
           <tr class="row" v-for = "book, key in filteredBooks">
           <td class="col-md-1"><a href="#" @click="showBookInfo(book)">{{book.title}}</a></td>
-          <td class="col-md-5">{{book.description}}</td>
-          <td class="col-md-1">{{book.price}} $</td>
+          <td class="col-md-3">{{book.description}}</td>
+          <td class="col-md-2">{{book.price}} $</td>
           <td class="col-md-1">
             <span v-for = "author in book.authors">
                <a  href="#" @click="setFilter('author', author.id)" > 
@@ -95,7 +102,7 @@
                 </span>
           </td>
           <td class="col-md-1">{{book.discount}} %</td>
-          <td class="col-md-1">{{(book.price - book.price*book.discount/100).toFixed(2)}} $</td>
+          <td class="col-md-2">{{(book.price - book.price*book.discount/100).toFixed(2)}} $</td>
              </tr> 
 
             </table>
@@ -130,6 +137,7 @@ export default {
       authors: [],
       genres: [],
       books:[],
+      errMsg: ''
     }
   },
   created(){
@@ -156,21 +164,16 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    // console.log(xhr.responseText)
                     var res = JSON.parse(xhr.responseText)
-                    
-                    if(typeof(res) == 'string')
+                    if(!res)
                     {
-                      self.logMsg = res
+                      self.logMsg = 'Wrong login or password'
                     }
                     else
                     {
                       self.user = res[0]
                       localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
                     }
-                    console.log(self.user)
-                    console.log(self.logMsg)
-
                   }
             }
           xhr.send(json)
@@ -183,7 +186,6 @@ export default {
     getAuthors: function(){
       var self = this
         var xhr = new XMLHttpRequest()
-        // http://192.168.0.15/~user9/bookShop/client/api/
         xhr.open('GET', getUrl()+'authors/', true)
         xhr.send();
           xhr.onreadystatechange = function() {
@@ -191,7 +193,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.authors = JSON.parse(xhr.responseText)
+                var res = JSON.parse(xhr.responseText)
+              if(res){
+                self.authors = res
+              }else{
+                self.errMsg = 'Authors not found'
+              }
               }
         }
     },
@@ -205,14 +212,18 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.genres = JSON.parse(xhr.responseText)
+                var res = JSON.parse(xhr.responseText)
+              if(res){
+                self.genres = res
+              }else{
+                self.errMsg = 'Genres not found'
               }
+            }
         }
     },
     getBooks: function(){
       var self = this
         var xhr = new XMLHttpRequest()
-        // xhr.open('GET', 'http://192.168.0.15/~user9/bookShop/client/api/books/', true)
         xhr.open('GET', getUrl()+'books/', true)
         xhr.send();
           xhr.onreadystatechange = function() {
@@ -220,8 +231,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                self.books = JSON.parse(xhr.responseText)
-                // console.log(self.books)
+                var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.books = res
+                }else{
+                  self.errMsg = 'Books not found'
+                }
               }
         }
     },
@@ -235,8 +250,10 @@ export default {
     },
         logOut: function(){
         var self = this
+        self.content = ''
         self.user = {}
         delete localStorage['user']
+        // self.$router.push({ path: '/'})
         self.getUserData()
         self.checkAuth()
       },
@@ -245,7 +262,7 @@ export default {
         if(localStorage['user'])
         {
          self.user = JSON.parse(localStorage['user'])
-       }
+        }
         else
         {
           self.user.name = ''
@@ -262,24 +279,20 @@ export default {
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
-                        // alert(xhr.status + ': ' + xhr.statusText)
-                       if(xhr.status == 401){
-                        self.user.id = '0'
-                        self.user.hash = '0'
-                        
-                       }
-                  } else if(JSON.parse(xhr.responseText) != 'NE ZALOGINEN'){
-                    self.user = JSON.parse(xhr.responseText)[0]
-                    localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
-                    }
-                    else{
-                        self.user.id = '0'
-                        self.user.hash = '0'
-                    }
-                  
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                     self.user = res[0]
+                   }
+                  }
             }
           xhr.send()        
-
       },
     clearInputs: function(){
       var self = this
@@ -375,7 +388,8 @@ li {
 }
 
 a {
-  color: #42b983;
+  color: #83512F;
+  font-weight: bold;
 }
 
 /* td{
@@ -394,11 +408,15 @@ table{
 
 .left{
   /* width: 400px; */
-  background-color: #f0bd86;
+  background-color: #E6C994;
 }
 .right{
   /* background-color: #f0bc86; */
 }
-
+.login{
+  height: 30px;
+  background:#DFCA95;
+  color:black;
+}
 
 </style>

@@ -61,9 +61,12 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    // console.log(xhr.responseText)
-                    if( JSON.parse(xhr.responseText) == 'Success')
-                    self.msg = 'Thank You! Please follow to Home page for Sign In'
+                    var res = JSON.parse(xhr.responseText)
+                    if(res === true){
+                      self.msg = 'Thank You! Please follow to Home page for Sign In'
+                    }
+                    else
+                    self.msg = res
                   }
             }
           xhr.send(json)

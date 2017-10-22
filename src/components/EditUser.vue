@@ -1,7 +1,7 @@
 <template>
   <div class="edit-user">
     EDIT USER
-    <p>{{msg}}</p>
+    
     <!-- {{userData.login}} -->
 
     <div class="form">
@@ -11,9 +11,10 @@
       <p> New Password:<input v-model="userData.pass" type="text" value=""></p>
       <p>Status: {{StatusString}} <button @click="changeStatus()" >Change</button></p>
       <p><button @click="save()">Save</button></p>
+      <p>{{msg}}</p>
     </div>
 
-        <button @click="showUserOrders()" >Show Orders</button>
+        <button @click="showUserOrders()" >Show Orders</button>{{orderMsg}}
         <div v-if="showOrdrers">
           <user-orders :id="userData.id"></user-orders>
         </div>
@@ -28,6 +29,7 @@ export default {
       beforeRouteUpdate(to, from, next) {
         this.getUser(to.params.id)
         this.showOrdrers = false
+        this.orderMsg = ''
         next()
     },
   data () {
@@ -36,12 +38,12 @@ export default {
       userData:'',
       msg:'',
       showOrdrers: false,
-      uId:''
+      orderMsg: ''
     }
   },
   created(){
     this.getUser(this.$route.params.id)
-    this.uId = this.$route.params.id
+    // this.uId = this.$route.params.id
   },
   
   methods:{
@@ -54,14 +56,13 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(JSON.parse(xhr.responseText)[0])
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.msg = res
+                if(res){
+                  self.userData = res[0]
+                  self.userData.status = !!+self.userData.status
                 }
                 else{
-                  self.userData = JSON.parse(xhr.responseText)[0]
-                  self.userData.status = !!+self.userData.status
+                  self.$router.push('/admin/')
                 }
 
               }
@@ -74,7 +75,6 @@ export default {
     },
     save: function(){
       var self = this
-
         var xhr = new XMLHttpRequest();
         var json = JSON.stringify(self.userData);
             xhr.open("PUT", getUrl()+'users/', true)
@@ -84,8 +84,15 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
-                            // console.log(xhr.responseText)
-                            // self.getOrders()
+                            var res = JSON.parse(xhr.responseText)
+                            if(res === true){
+                              self.msg = 'Updated'
+                              self.$parent.getUsers()
+                            }
+                            else{
+                              self.msg = res
+                            }
+                            self.getUser(self.$route.params.id)
                     }
               }
             xhr.send(json)
@@ -100,7 +107,6 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
                 if(typeof(res) == 'string'){
                   self.msg = res
@@ -115,6 +121,7 @@ export default {
     },
     showUserOrders: function(){
       var self = this
+      self.orderMsg = ''
       self.showOrdrers = !self.showOrdrers
     }
 
@@ -128,14 +135,14 @@ export default {
       return 'Inactive'
     },
 
-    Data(){
-      var self = this
-      if(self.$route.params.id != self.uId){
-        // self.getUser()
-        console.log(self.$route.params.id)
-        console.log(self.userData.id)
-      }
-    }
+    // Data(){
+    //   var self = this
+    //   if(self.$route.params.id != self.uId){
+    //     // self.getUser()
+    //     console.log(self.$route.params.id)
+    //     console.log(self.userData.id)
+    //   }
+    // }
 
   },
   components:{

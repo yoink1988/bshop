@@ -1,5 +1,5 @@
 <template>
-  <div class="orders">
+  <div v-if="orders" class="orders">
       <div class="or-rowhead">      
         <div class="or-cell2">
           Order ID
@@ -30,6 +30,7 @@
         </div>
         <div class="or-cell4">
         </div>
+        <button @click="dateSort()" class="sort">^</button>
       </div>
 
   <div v-for="(order, index) in arrayToDraw" :key="order.id" >
@@ -132,7 +133,8 @@ export default {
     return {
       orders:'',
       statuses:'',
-      refreshed: false
+      refreshed: false,
+      sort: true
     }
   },
   created(){
@@ -264,6 +266,11 @@ export default {
 
     },
   
+  dateSort: function(){
+    var self = this
+    self.sort = false
+    self.refreshed = false
+  }
     
   },
   computed:{
@@ -271,9 +278,11 @@ export default {
       var self = this
       var arr = self.orders
       if(!self.refreshed){
-        arr = self.orders
         self.refreshed = true
-      }
+      if(!self.sort){
+        arr = arr.reverse()
+        }
+       }
       return arr
     }
   }
@@ -404,5 +413,9 @@ a {
     padding: 5px 5px;
       width: 120px;
 }
+
+/* .sort{
+  height: 20px;;
+} */
 
 </style>

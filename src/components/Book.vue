@@ -47,8 +47,13 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    self.msg = JSON.parse(xhr.responseText)
-                    self.count = ''
+                    var res = JSON.parse(xhr.responseText)
+                    if(!res){
+                      self.msg = 'Count must me a positive Integer'
+                    }
+                    else{
+                      self.msg = res
+                    }
                   }
             }
           xhr.send(json)

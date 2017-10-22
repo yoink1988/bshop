@@ -94,8 +94,8 @@ export default {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.msg = res
+                if(res === false){
+                  self.msg = 'Cart is empty yet'
                   self.booksInCart =''
                 }
                 else{
@@ -146,8 +146,12 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
-                            // console.log(xhr.responseText)
-                       self.saveMsg = JSON.parse(xhr.responseText)
+                      var res = JSON.parse(xhr.responseText)
+                       if(res !== true){
+                         self.saveMsg = 'Count must be a positive Integer'
+                       }else{
+                         self.saveMsg = 'Updated'
+                       }
                       self.getBooksFromCart()
                     }
               }
@@ -175,17 +179,15 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(xhr.responseText)
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.msg = res
+                if(res === false){
+                  self.msg = 'Payment not found'
                 }
                 else{
                     res.forEach(function(el){
                     el.checked = false
                   })
                   self.payment = res
-                  console.log(self.payment)
                 }
               }
         }
@@ -217,9 +219,13 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    console.log(xhr.responseText)
+                    var res = JSON.parse(xhr.responseText)
+                    if(res){
                     self.clearCart()
-                    self.$router.push({ path: '/thankyou/'})
+                    }
+                    else{
+                      self.msg = 'Sorry, try again later'
+                    }
                   }
             }
           xhr.send(json)
@@ -235,11 +241,15 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    if(JSON.parse(xhr.responseText) == 'Cleared'){
-                       self.showCart = false
-                      self.$parent.ordered = true
+                    var res = JSON.parse(xhr.responseText)
+                    if(res){
+                      self.$router.push({ path: '/thankyou/'})
                     }
-                  }
+                    else{
+                      self.msg = 'Sorry, try again later'
+                    }
+             }
+                  
         }
         xhr.send(null);
     }

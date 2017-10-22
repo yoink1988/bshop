@@ -1,6 +1,6 @@
 <template>
     <div class="user-orders">
-      <div class="or-rowhead">      
+      <div v-if="orders" class="or-rowhead">      
         <div class="or-cell2">
           Order ID
         </div>
@@ -29,6 +29,7 @@
           Order Total:
         </div>
         <div class="or-cell4">
+           <button @click="dateSort()" class="sort">^</button>
         </div>
       </div>
 
@@ -136,7 +137,8 @@ export default {
       msg:'',
       orders:'',
       statuses:'',
-      refreshed: false
+      refreshed: false,
+      sort: true
     }
   },
   created(){
@@ -153,15 +155,14 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.msg = res
-                }
-                else{
+                if(res){
                   self.orders = JSON.parse(xhr.responseText)
                   self.calculateSumm()
                   self.addSatusSelect()
+                }
+                else{
+                  self.$parent.orderMsg = 'Have no orders'
                 }
 
               }
@@ -177,14 +178,12 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.msg = res
+                if(res){
+                  self.statuses = res
                 }
                 else{
-                  self.statuses = JSON.parse(xhr.responseText)
-
+                  self.msg = 'Statuses not found'
                 }
 
               }
@@ -223,7 +222,6 @@ export default {
           order.newStatus = ''
         }
       })
-      // order.stat.unshift({'id': order.s_id, 'name': order.s_name})
     })
     self.orders = orders
   },
@@ -260,12 +258,20 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
-                            console.log(xhr.responseText)
+                            var res = JSON.parse(xhr.responseText)
+                            if(res){
+                              self.$parent.orderMsg = 'Status Updated'
+                            }
                             self.getOrders()
                     }
               }
             xhr.send(json)
     },
+    dateSort: function(){
+    var self = this
+    self.sort = false
+    self.refreshed = false
+  }
   
     
   },
@@ -274,9 +280,11 @@ export default {
       var self = this
       var arr = self.orders
       if(!self.refreshed){
-        arr = self.orders
         self.refreshed = true
-      }
+      if(!self.sort){
+        arr = arr.reverse()
+        }
+       }
       return arr
     }
   }

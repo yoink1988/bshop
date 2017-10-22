@@ -26,8 +26,8 @@
                             </select></p>
 
         <p><button @click="save()" class="test">Save</button></p>
-        <p>{{errMsg}}</p>
-        <button @click="test()" class="test">TEST</button>
+        <p>{{msg}}</p>
+        <!-- <button @click="test()" class="test">TEST</button> -->
       </div>
   </div>
 </template>
@@ -36,16 +36,19 @@
 export default {
   name: 'EditBook',
       beforeRouteUpdate(to, from, next) {
-        this.getBooks(to.params.id)
-        this.showOrdrers = false
+        if(this.getBooks(to.params.id)){
         next()
+        }
+        // else{
+        //   this.$router.push('/admin/')
+        // }
     },
   data () {
     return {
       authors:'',
       genres:'',
       book:'',
-      errMsg:'',
+      msg:'',
       bookGenres:'',
       bookAuthors:'',
       authorsToDelete:[],
@@ -71,7 +74,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.authors = JSON.parse(xhr.responseText)
+                  var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.authors = res
+                }else{
+                  self.msg = 'Authors not found'
+                }
               }
         }
     },
@@ -85,7 +93,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.genres = JSON.parse(xhr.responseText)
+                  var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.genres = res
+                }else{
+                  self.msg = 'Genres not found'
+                }
               }
         }
     },
@@ -99,10 +112,16 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                self.book = JSON.parse(xhr.responseText)[0]
+                var res = JSON.parse(xhr.responseText)
+                if(res){
+                self.book = res[0]
                 self.bookGenres = self.book.genres
                 self.bookAuthors = self.book.authors
                 self.bookStatus = !!+self.book.status
+                }
+                else{
+                  self.$router.push('/admin/')
+                }
               }
         }
     },
@@ -129,7 +148,7 @@ export default {
     },
     save: function(){
       var self = this
-      self.errMsg = ''
+      self.msg = ''
       if(self.validForm()){
         var xhr = new XMLHttpRequest();
         var json = JSON.stringify({
@@ -153,8 +172,14 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
+                            var res = JSON.parse(xhr.responseText)
+                            if(res === true){
+                              self.$parent.getBooks()
+                              self.msg = 'Updated'
+                            }else{
+                              self.msg = res
+                            }
                             self.getBooks(self.book.id)
-                          console.log(xhr.responseText)
                     }
               }
             xhr.send(json)
@@ -169,11 +194,11 @@ export default {
     validForm: function(){
       var self = this
       if((self.authorsToAdd.length + (self.bookAuthors.length - self.authorsToDelete.length) < 1)){
-        self.errMsg = 'book must have at least 1 author'
+        self.msg = 'book must have at least 1 author'
         return false
       }
       if((self.genresToAdd.length + (self.bookGenres.length - self.genresToDelete.length) < 1)){
-        self.errMsg = 'book must have at least 1 genre'
+        self.msg = 'book must have at least 1 genre'
         return false
       }
       return true

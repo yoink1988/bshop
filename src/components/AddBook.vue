@@ -14,7 +14,7 @@
                             </select></p>
         <p><button @click="addBook()" class="test">Submit</button></p>
         <p>{{errMsg}}</p>
-        <button @click="test()" class="test">TEST</button>
+        <!-- <button @click="test()" class="test">TEST</button> -->
       </div>
   </div>
 </template>
@@ -50,7 +50,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.authors = JSON.parse(xhr.responseText)
+                  var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.authors = res
+                }else{
+                  self.errMsg = 'Authors not found'
+                }
               }
         }
     },
@@ -64,7 +69,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.genres = JSON.parse(xhr.responseText)
+                  var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.genres = res
+                }else{
+                  self.errMsg = 'Genres not found'
+                }
               }
         }
     },
@@ -93,8 +103,14 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    console.log(xhr.responseText)
-                    // self.msg = JSON.parse(xhr.responseText)
+                    var res = JSON.parse(xhr.responseText)
+                    if(res === true){
+                      self.errMsg = 'Added'
+                      self.$router.push({ path: '/admin/'})
+                    }else{
+                      self.errMsg = res
+                    }
+                    // console.log(xhr.responseText)
                   }
             }
           xhr.send(json)

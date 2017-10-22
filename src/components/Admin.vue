@@ -111,7 +111,6 @@ import EditBook from './EditBook'
 import Test from './Test'
 import Register from './Register'
 import EditUser from './EditUser'
-// import AdminOrders from './AdminOrders'
 export default {
   name: 'Admin',
   data () {
@@ -149,36 +148,34 @@ export default {
   methods:{
       checkAuth: function(){
       var self = this
-
       var xhr = new XMLHttpRequest();
-          xhr.open("GET", getUrl()+'auth/id/'+self.user.id+'/hash/'+self.user.hash, false)
+          xhr.open("GET", getUrl()+'auth/id/'+self.user.id+'/hash/'+self.user.hash, true)
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
-                        //  alert(xhr.status + ': ' + xhr.statusText)
-                        self.user.name = 'Guest'
-                        self.user.role = 'guest'
-                        self.user.id = '0'
-                        self.user.hash = '0'
-                        // self.checkRole()
-                  } else {
-                    self.user = JSON.parse(xhr.responseText)[0]
-                    
-                    console.log(self.user.role)
-                    localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                     self.user = res[0]
+                   }
                   }
                   self.checkRole()
             }
           xhr.send()        
-
       },
       getUserData: function(){
         var self = this
         if(localStorage['user'])
         {
          self.user = JSON.parse(localStorage['user'])
-       }
+        }
         else
         {
           self.user.name = ''
@@ -199,7 +196,7 @@ export default {
       var self = this
       self.$parent.testik()
     },
-   getAuthors: function(){
+    getAuthors: function(){
       var self = this
         var xhr = new XMLHttpRequest()
         xhr.open('GET', getUrl()+'authors/', true)
@@ -209,7 +206,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.authors = JSON.parse(xhr.responseText)
+                  var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.authors = res
+                }else{
+                  self.errMsg = 'Authors not found'
+                }
               }
         }
     },
@@ -223,7 +225,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-              self.genres = JSON.parse(xhr.responseText)
+                  var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.genres = res
+                }else{
+                  self.errMsg = 'Genres not found'
+                }
               }
         }
     },
@@ -237,7 +244,12 @@ export default {
               if (xhr.status != 200) {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                self.books = JSON.parse(xhr.responseText)
+                var res = JSON.parse(xhr.responseText)
+                if(res){
+                  self.books = res
+                }else{
+                  self.errMsg = 'Books not found'
+                }
               }
         }
     },
@@ -254,21 +266,27 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    self.authMsg = JSON.parse(xhr.responseText)
+                    var res = JSON.parse(xhr.responseText) 
+                    if(!res){
+                      self.authMsg = 'Check Name field'
+                    }
+                    else{
+                      self.authMsg = 'Added'
+                      self.newAuth = ''
+                    }
                     self.getAuthors()
-                    self.newAuth = ''
                   }
             }
           xhr.send(json)
       }
       else{
-        self.authMsg = 'Check name field'
+        self.authMsg = 'Check Name field'
       }
     },
     renameAuthor: function(){
       var self = this
       self.authMsg = ''
-      if(self.editAuthName && self.editAuth){
+      if(self.editAuthName){
         var xhr = new XMLHttpRequest();
         var json = JSON.stringify({
           'id':self.editAuth,
@@ -281,10 +299,15 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
-                        self.authMsg = JSON.parse(xhr.responseText)
+                            var res = JSON.parse(xhr.responseText)
+                        if(res){
+                          self.authMsg = 'Updated'
+                          self.editAuth = ''
+                          self.editAuthName = ''
+                        }else{
+                          self.authMsg = 'Check Name field'
+                        }
                         self.getAuthors()
-                        self.editAuth = ''
-                        self.editAuthName = ''
                     }
               }
             xhr.send(json)
@@ -296,7 +319,6 @@ export default {
     deleteAuthor: function(){
       var self = this
       self.authMsg = ''
-
       if(self.editAuth){
         var xhr = new XMLHttpRequest();
         xhr.open("DELETE", getUrl()+'authors/id/'+self.editAuth, true);
@@ -306,7 +328,13 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                        self.authMsg = JSON.parse(xhr.responseText)
+                      var res = JSON.parse(xhr.responseText)
+                      if(res){
+                        self.authMsg = 'Deleted'
+                      }
+                      else{
+                        self.authMsg = 'Fail'
+                      }
                         self.getAuthors()
                         self.editAuth = ''
                         self.editAuthName = ''
@@ -331,9 +359,14 @@ export default {
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                    self.genreMsg = JSON.parse(xhr.responseText)
-                    self.getGenres()
-                    self.newGenre = ''
+                    var res = JSON.parse(xhr.responseText)
+                    if(res){
+                      self.genreMsg = 'Added'
+                      self.newGenre = ''
+                      self.getGenres()
+                    }else{
+                      self.genreMsg = 'Check Name field'
+                    }
                   }
             }
           xhr.send(json)
@@ -358,10 +391,15 @@ export default {
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
-                        self.genreMsg = JSON.parse(xhr.responseText)
-                        self.getGenres()
-                        self.editGenre = ''
-                        self.editGenreName = ''
+                            var res = JSON.parse(xhr.responseText)
+                            if(res){
+                              self.genreMsg = 'Updated'
+                              self.editGenre = ''
+                              self.editGenreName = ''
+                              self.getGenres()
+                            }else{
+                              self.genreMsg = 'Check Name field'
+                            }
                     }
               }
             xhr.send(json)
@@ -373,26 +411,30 @@ export default {
     deleteGenre: function(){
       var self = this
       self.genreMsg = ''
-
       if(self.editGenre){
         var xhr = new XMLHttpRequest();
         xhr.open("DELETE", getUrl()+'genres/id/'+self.editGenre, true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
-                if (xhr.readyState != 4) return
+              if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
                         alert(xhr.status + ': ' + xhr.statusText)
                   } else {
-                        self.genreMsg = JSON.parse(xhr.responseText)
-                        self.getGenres()
+                    var res = JSON.parse(xhr.responseText)
+                    if(res){
+                        self.genreMsg = 'Deleted'
                         self.editGenre = ''
                         self.editGenreName = ''                        
+                        self.getGenres()
+                    }else{
+                        self.genreMsg = 'Check Name field'
+                    }
                   }
           }
           xhr.send(null);     
         }
         else{
-            self.genreMsg = 'Select an Author'      
+            self.genreMsg = 'Select a Genre'      
         }
     },
     getUsers: function(){
@@ -406,13 +448,12 @@ export default {
                     alert(xhr.status + ': ' + xhr.statusText)
               } else {
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.errMsg = res
+                if(!res){
+                  self.errMsg = 'Not found'
                 }
                 else{
                   self.users = res
-                  console.log(self.users)
-                }
+                  }
               }
         }     
     },
@@ -424,12 +465,6 @@ export default {
       var self = this
       self.content = 'addBook'
     },
-    // showEditBook: function(){
-    //   var self = this
-    //   if(self.editBook){
-    //     self.content = 'editBook'
-    //   }
-    // },
     showEditUserDetails: function(){
       var self = this
       if(self.editUser){

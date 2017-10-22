@@ -39,7 +39,7 @@ export default {
 }
 
 body{
-    background-color: #fac287;
+    background-color: #FFDCA8;
 }
 
 /* .menu{

@@ -2,7 +2,7 @@
   <div class="orders">
     <h4> My Orders:</h4>
     <p>{{msg}}</p>
-    <div>
+    <div v-if="orders">
       <div class="or-rowhead">      
         <div class="or-cell2">
           Order ID
@@ -23,6 +23,7 @@
           Order Total:
         </div>
         <div class="or-cell4">
+          <button @click="dateSort()" class="sort">^</button>
         </div>
       </div>
 
@@ -113,7 +114,8 @@ export default {
     return {
       orders:'',
       refreshed: false,
-      msg:''
+      msg:'',
+      sort: true
     }
   },
   created(){
@@ -123,7 +125,6 @@ export default {
   methods:{
     getOrders: function(){
         var self = this
-        console.log(self.user.id)
         var xhr = new XMLHttpRequest()
         xhr.open('GET', getUrl()+'orders/'+self.user.id, true)
           xhr.onreadystatechange = function() {
@@ -131,10 +132,10 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                console.log(JSON.parse(xhr.responseText))
+                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.msg = res
+                if(!res){
+                  self.msg = 'You have no orders yet'
                 }
                 else{
                   self.orders = JSON.parse(xhr.responseText)
@@ -177,7 +178,11 @@ export default {
     })
     self.orders = orders
   },
-
+    dateSort: function(){
+    var self = this
+    self.sort = false
+    self.refreshed = false
+  }
     
   },
   computed:{
@@ -185,9 +190,11 @@ export default {
       var self = this
       var arr = self.orders
       if(!self.refreshed){
-        arr = self.orders
         self.refreshed = true
-      }
+      if(!self.sort){
+        arr = arr.reverse()
+        }
+       }
       return arr
     }
   }
