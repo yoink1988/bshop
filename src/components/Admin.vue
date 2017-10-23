@@ -4,12 +4,11 @@
         <div class="row">
       <div class="col-md-3 left">
         <router-link to="/">Home</router-link>
-        <!-- <router-link to="/admin/test/">qwewqe</router-link> -->
         <div class="authors">
           Authors:
           <div class="new-author">
             Author name:<input type="text" v-model="newAuth">
-            <button @click="addAuthor()" class="add-auth">Add</button>
+            <button @click="addAuthor()" class="add-auth btnn">Add</button>
           </div>
           <div class="edit">
             Edit or delete:<select v-model="editAuth" class="authors">
@@ -18,8 +17,8 @@
             </select>
             <div v-if="editAuth" class="ed-a">
               New name:<input type="text" v-model="editAuthName" >
-              <button @click="renameAuthor()" class="del-auth">Rename</button>
-              <button @click="deleteAuthor()" class="del-auth">Delete</button>
+              <button @click="renameAuthor()" class="del-auth btnn">Rename</button>
+              <button @click="deleteAuthor()" class="del-auth btnn">Delete</button>
             </div>
           </div>
           <div class="auth-msg">
@@ -31,7 +30,7 @@
         Genres:
           <div class="new-genre">
             Genre name:<input type="text" v-model="newGenre">
-            <button @click="addGenre()" class="add-genre">Add</button>
+            <button @click="addGenre()" class="add-genre btnn">Add</button>
           </div>
           <div class="edit">
           Edit or delete:<select v-model="editGenre" class="genres">
@@ -40,8 +39,8 @@
           </select>
           <div v-if="editGenre" class="ed-g">
             New name:<input type="text" v-model="editGenreName">
-            <button @click="renameGenre()" class="del-genre">Rename</button>
-            <button @click="deleteGenre()" class="del-genre">Delete</button>
+            <button @click="renameGenre()" class="del-genre btnn">Rename</button>
+            <button @click="deleteGenre()" class="del-genre btnn">Delete</button>
           </div>
         </div>
         <div class="genre-msg">
@@ -52,16 +51,13 @@
       <div class="books">
         Books:
         <div>
-          <router-link to="/admin/addbook/"><button class="add-user">Add Book</button></router-link>
-          <!-- <button @click="showAddBook()" class="new-book">Add Book</button> -->
+          <router-link to="/admin/addbook/"><button class="add-user btnn">Add Book</button></router-link>
         </div>
           <p><select v-model="editBook" class="books">
             <option value="" class="default">Select Book</option>
             <option v-for="book in books" :value="book.id">{{book.title}}</option>
           </select> 
-          
-          <!-- <button @click="showEditBook()" class="book-edit">Edit</button> -->
-          <button @click="showEditBook()" >Edit</button>
+          <button class="btnn" @click="showEditBook()" >Edit</button>
 
           </p>
           <div class="book-msg">
@@ -72,29 +68,31 @@
       <div class="users">
         Users:
         <div class="new-user">
-          <router-link to="/admin/adduser/"><button class="add-user">Add User</button></router-link>
+          <router-link to="/admin/adduser/"><button class="add-user btnn">Add User</button></router-link>
         </div>
         <div class="edit">
           <select v-model="editUser" name="" id="" class="sel-users">
           <option value="" class="default">Select User</option>
           <option v-for="user in users" :value="user.id" >{{user.name}}</option>
           </select>
-          <button @click="showEditUserDetails()" class="edit-user">Edit User</button>
+          <button @click="showEditUserDetails()" class="edit-user btnn">Edit User</button>
         </div>
 
       </div>
 
       <div class="orders">
 
-          <button @click="showOrders()" class="view-orders">View Orders</button>
+          <button @click="showOrders()" class="view-orders btnn">View Orders</button>
 
       </div>
 
      
       </div>
-      <div class="col-md-9 right">
-      <h2>Admin bookshop</h2>
-      <router-view></router-view>
+      <div class="col-md-9 right " >
+        <h2 style="text-align:center">Admin bookshop</h2>
+        <div class="row" style="margin:40px">
+        <router-view></router-view>
+      </div>
       </div>
 
       </div>
@@ -108,7 +106,6 @@
 import AdminOrders from './AdminOrders'
 import AddBook from './AddBook'
 import EditBook from './EditBook'
-import Test from './Test'
 import Register from './Register'
 import EditUser from './EditUser'
 export default {
@@ -138,7 +135,7 @@ export default {
   },
   created(){
     this.getUserData()
-    this.checkAuth()
+
     this.getAuthors()
     this.getGenres()
     this.getBooks()
@@ -149,7 +146,8 @@ export default {
       checkAuth: function(){
       var self = this
       var xhr = new XMLHttpRequest();
-          xhr.open("GET", getUrl()+'auth/id/'+self.user.id+'/hash/'+self.user.hash, true)
+          xhr.open("GET", getUrl()+'auth/', true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
@@ -163,13 +161,38 @@ export default {
                     self.user.hash = '0'
                    }
                    else{
-                     self.user = res[0]
+                     self.getUserInfo()
                    }
                   }
-                  self.checkRole()
             }
           xhr.send()        
       },
+      getUserInfo: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'users/'+self.user.id, true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                    self.user = res[0]
+                    self.checkRole()
+                   }
+                  }
+            }
+          xhr.send()  
+      },
+
       getUserData: function(){
         var self = this
         if(localStorage['user'])
@@ -184,6 +207,7 @@ export default {
           self.user.hash = '0'
 
         }
+        self.checkAuth()
       },
     checkRole: function(){
       var self = this
@@ -260,6 +284,7 @@ export default {
       var xhr = new XMLHttpRequest();
       var json = JSON.stringify({'name':self.newAuth});
           xhr.open("POST", getUrl()+'authors/', true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));          
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
@@ -294,6 +319,7 @@ export default {
         });
             xhr.open("PUT", getUrl()+'authors/', true)
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));             
               xhr.onreadystatechange = function() {
                   if (xhr.readyState != 4) return
                     if (xhr.status != 200) {
@@ -323,6 +349,7 @@ export default {
         var xhr = new XMLHttpRequest();
         xhr.open("DELETE", getUrl()+'authors/id/'+self.editAuth, true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));         
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
@@ -354,6 +381,7 @@ export default {
       var json = JSON.stringify({'name':self.newGenre});
           xhr.open("POST", getUrl()+'genres/', true)
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));           
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
@@ -386,6 +414,7 @@ export default {
         });
             xhr.open("PUT", getUrl()+'genres/', true)
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));             
               xhr.onreadystatechange = function() {
                   if (xhr.readyState != 4) return
                     if (xhr.status != 200) {
@@ -415,6 +444,7 @@ export default {
         var xhr = new XMLHttpRequest();
         xhr.open("DELETE", getUrl()+'genres/id/'+self.editGenre, true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));         
             xhr.onreadystatechange = function() {
               if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
@@ -441,7 +471,7 @@ export default {
        var self = this
         var xhr = new XMLHttpRequest()
         xhr.open('GET', getUrl()+'users/', true)
-        xhr.send();
+
           xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return
               if (xhr.status != 200) {
@@ -455,7 +485,8 @@ export default {
                   self.users = res
                   }
               }
-        }     
+        } 
+      xhr.send();    
     },
     showOrders: function(){
       var self = this
@@ -498,15 +529,11 @@ export default {
             book.push(el)
           }
         });
-        console.log(book)
         return book
       }
     }
   }
   
-  
-
-
 
 }
 </script>
@@ -515,18 +542,6 @@ export default {
 <style scoped>
 h1, h2 {
   font-weight: normal;
-}
-
-
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
 }
 
 td{
@@ -549,8 +564,14 @@ a {
   color: #42b983;
 }
 
-.lefta{
-
+.left{
+  background-color: #fce3c7;
+  padding: 30px;
 }
 
+.btnn{
+  height: 30px;
+  background:#FFDCA8;
+  color:black;
+}
 </style>

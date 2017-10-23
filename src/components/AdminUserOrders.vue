@@ -130,7 +130,7 @@
 <script>
 export default {
   name: 'OrdersOfUser',
-  props:['id'],
+  props:['id', 'user'],
   data () {
     return {
       userData:'',
@@ -253,7 +253,8 @@ export default {
         var json = JSON.stringify({id:self.orders[index].id, id_status:self.orders[index].s_id});
             xhr.open("PUT", getUrl()+'orders/', true)
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-              xhr.onreadystatechange = function() {
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));            
+               xhr.onreadystatechange = function() {
                   if (xhr.readyState != 4) return
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}

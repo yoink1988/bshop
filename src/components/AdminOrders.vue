@@ -95,7 +95,7 @@
               Sum of position
             </div>
       </div>
-      <div v-for="book in order.books" class="od-row">
+        <div v-for="book in order.books" class="od-row">
             <div class="od-cell1">
               {{book.b_id}}
             </div>
@@ -115,7 +115,7 @@
               {{((+book.price * +book.count) - ((+book.count * +book.price * +book.discount)/100)).toFixed(2)}}
             </div>
 
-      </div>
+            </div>
             <div class="od-row">
               <div class="od-cell4">
                 <button  @click="hide(index)" >Hide</button>
@@ -134,14 +134,89 @@ export default {
       orders:'',
       statuses:'',
       refreshed: false,
-      sort: true
+      sort: true,
+      user:''
     }
   },
   created(){
+    this.getUserData()
     this.getStatuses()
     this.getOrders()
   },
   methods:{
+      checkAuth: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'auth/', true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                     self.getUserInfo()
+                   }
+                  }
+            }
+          xhr.send()        
+      },
+      getUserInfo: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'users/'+self.user.id, true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                    self.user = res[0]
+                    self.checkRole()
+                   }
+                  }
+            }
+          xhr.send()  
+      },
+
+      getUserData: function(){
+        var self = this
+        if(localStorage['user'])
+        {
+         self.user = JSON.parse(localStorage['user'])
+        }
+        else
+        {
+          self.user.name = ''
+          self.user.role = 'guest'
+          self.user.id = '0'
+          self.user.hash = '0'
+
+        }
+        self.checkAuth()
+      },
+    checkRole: function(){
+      var self = this
+      if(self.user.role != 'admin')
+      {
+        self.$router.push('/')
+      }
+  },
     getOrders: function(){
         var self = this
         var xhr = new XMLHttpRequest()
@@ -151,7 +226,6 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
                 if(typeof(res) == 'string'){
                   self.msg = res
@@ -175,7 +249,6 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
                 if(typeof(res) == 'string'){
                   self.msg = res
@@ -221,7 +294,6 @@ export default {
           order.newStatus = ''
         }
       })
-      // order.stat.unshift({'id': order.s_id, 'name': order.s_name})
     })
     self.orders = orders
   },
@@ -253,12 +325,12 @@ export default {
         var json = JSON.stringify({id:self.orders[index].id, id_status:self.orders[index].s_id});
             xhr.open("PUT", getUrl()+'orders/', true)
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));            
               xhr.onreadystatechange = function() {
                   if (xhr.readyState != 4) return
                     if (xhr.status != 200) {
                           alert(xhr.status + ': ' + xhr.statusText)}
                           else {
-                            console.log(xhr.responseText)
                             self.getOrders()
                     }
               }
@@ -286,22 +358,14 @@ export default {
       return arr
     }
   }
-  
-  
-
-
-
-}
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
-  /* padding: 30px; */
 }
-
-
 
 ul {
   list-style-type: none;
@@ -413,9 +477,4 @@ a {
     padding: 5px 5px;
       width: 120px;
 }
-
-/* .sort{
-  height: 20px;;
-} */
-
 </style>

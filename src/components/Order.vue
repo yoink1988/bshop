@@ -3,6 +3,8 @@
     <h4> My Orders:</h4>
     <p>{{msg}}</p>
     <div v-if="orders">
+      <table class="table">
+        <thead>
       <div class="or-rowhead">      
         <div class="or-cell2">
           Order ID
@@ -26,84 +28,88 @@
           <button @click="dateSort()" class="sort">^</button>
         </div>
       </div>
+  </thead>
+  <tbody>
+      <div v-for="(order, index) in arrayToDraw" :key="order.id" >
+          <div @click="show(index)" class="or-row">
+            <div class="or-cell2">
+              {{order.id}}
+            </div>
+            <div class="or-cell4">
+              {{order.u_disc}}
+            </div>
+            <div class="or-cell4">
+              {{order.p_name}}
+            </div>
+            <div class="or-cell4">
+              {{order.s_name}}
+            </div>
+            <div class="or-cell5">
+              {{order.date}}
+            </div>
+            <div class="or-cell4">
+              {{order.summ}} $
+            </div>
+            <div  class="or-cell4">
+            </div>
+        </div>
+      <div v-if="order.showSelect == true">
+          <div class="or-row">
+                <div class="od-cell1">
+                  Book Id
+                </div>
+                <div class="od-cell2">
+                  Book Title
+                </div>
+                <div class="od-cell3">
+                  Book count
+                </div>
+                <div class="od-cell4">
+                  Book price
+                </div>
+                <div class="od-cell5">
+                  Book discount
+                </div>
+                <div class="od-cell5">
+                  Sum of position
+                </div>
+          </div>
+          <div v-for="book in order.books" class="od-row">
+                <div class="od-cell1">
+                  {{book.b_id}}
+                </div>
+                <div class="od-cell2">
+                  {{book.title}}
+                </div>
+                <div class="od-cell3">
+                  {{book.count}}
+                </div>
+                <div class="od-cell4">
+                  {{book.price}}
+                </div>
+                <div class="od-cell5">
+                  {{book.discount}}
+                </div>
+                <div class="od-cell5">
+                  {{((+book.price * +book.count) - ((+book.count * +book.price * +book.discount)/100)).toFixed(2)}}
+                </div>
 
-  <div v-for="(order, index) in arrayToDraw" :key="order.id" >
-      <div @click="show(index)" class="or-row">
-         <div class="or-cell2">
-          {{order.id}}
-        </div>
-        <div class="or-cell4">
-          {{order.u_disc}}
-        </div>
-        <div class="or-cell4">
-          {{order.p_name}}
-        </div>
-        <div class="or-cell4">
-          {{order.s_name}}
-        </div>
-        <div class="or-cell5">
-          {{order.date}}
-        </div>
-        <div class="or-cell4">
-          {{order.summ}} $
-        </div>
-        <div  class="or-cell4">
-        </div>
-     </div>
-  <div v-if="order.showSelect == true">
-      <div class="or-row">
-            <div class="od-cell1">
-              Book Id
-            </div>
-            <div class="od-cell2">
-              Book Title
-            </div>
-            <div class="od-cell3">
-              Book count
-            </div>
-            <div class="od-cell4">
-              Book price
-            </div>
-            <div class="od-cell5">
-              Book discount
-            </div>
-            <div class="od-cell5">
-              Sum of position
-            </div>
+          </div>
+                <div class="od-row">
+                  <div class="od-cell4">
+                    <button  @click="hide(index)" >Hide</button>
+                  </div>
+                </div>
+          </div>
       </div>
-      <div v-for="book in order.books" class="od-row">
-            <div class="od-cell1">
-              {{book.b_id}}
-            </div>
-            <div class="od-cell2">
-              {{book.title}}
-            </div>
-            <div class="od-cell3">
-              {{book.count}}
-            </div>
-            <div class="od-cell4">
-              {{book.price}}
-            </div>
-            <div class="od-cell5">
-              {{book.discount}}
-            </div>
-            <div class="od-cell5">
-              {{((+book.price * +book.count) - ((+book.count * +book.price * +book.discount)/100)).toFixed(2)}}
-            </div>
-
-      </div>
-            <div class="od-row">
-              <div class="od-cell4">
-                <button  @click="hide(index)" >Hide</button>
-              </div>
-            </div>
-      </div>
-  </div>
+  </tbody>
+  </table>
 </div>
-  </div>
+
+
 
   </div>
-  </div>
+
 </template>
 
 <script>
@@ -132,7 +138,6 @@ export default {
               if (xhr.status != 200) {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
-                // console.log(JSON.parse(xhr.responseText))
                 var res = JSON.parse(xhr.responseText)
                 if(!res){
                   self.msg = 'You have no orders yet'

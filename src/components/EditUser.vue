@@ -1,24 +1,37 @@
 <template>
   <div class="edit-user">
-    EDIT USER
-    
-    <!-- {{userData.login}} -->
+    EDIT USER <b>{{userData.id}}</b>
 
-    <div class="form">
-      <p>Name:<input v-model="userData.name" type="text" :value="userData.name"></p>
-      <p>Login\Email:<input v-model="userData.login" type="email" :value="userData.login"></p>
-      <p> Discount:<input v-model="userData.discount" type="text" :value="userData.discount"></p>
-      <p> New Password:<input v-model="userData.pass" type="text" value=""></p>
-      <p>Status: {{StatusString}} <button @click="changeStatus()" >Change</button></p>
-      <p><button @click="save()">Save</button></p>
-      <p>{{msg}}</p>
-    </div>
+    <div class="row">
+      <div class="col-md-5">
 
-        <button @click="showUserOrders()" >Show Orders</button>{{orderMsg}}
-        <div v-if="showOrdrers">
-          <user-orders :id="userData.id"></user-orders>
+          <form style="margin:auto">
+            <div class="form-group">
+              <label for="exampleInputEmail1">Name</label>
+              <input  v-model="userData.name"  type="text" class="form-control" >
+            </div>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Email</label>
+              <input  v-model="userData.login"  type="email" class="form-control" >
+            </div>
+            <div class="input-group">
+              <span class="input-group-addon">Discount</span>
+              <input v-model="userData.discount" type="text" class="form-control" >
+            </div>
+            <div class="form-group">
+              <label for="exampleInputEmail1"> New password</label>
+              <input  v-model="userData.pass"  type="password" value="" class="form-control" >
+            </div>
+            <div class="input-group">
+              <span class="input-group-addon">{{StatusString}}</span>
+              <button @click="changeStatus()" type="submit" class="btn btn-primary">Change</button>
+            </div>         
+
+              <button @click="save()" type="button" class="btn btn-primary btn-lg btn-block">Save</button>
+          </form>
+
         </div>
-
+   </div>
    </div>
 </template>
 
@@ -42,11 +55,84 @@ export default {
     }
   },
   created(){
+    this.getUserData()
     this.getUser(this.$route.params.id)
-    // this.uId = this.$route.params.id
   },
   
   methods:{
+         checkAuth: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'auth/', true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                     self.getUserInfo()
+                   }
+                  }
+            }
+          xhr.send()        
+      },
+      getUserInfo: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'users/'+self.user.id, true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                    self.user = res[0]
+                    self.checkRole()
+                   }
+                  }
+            }
+          xhr.send()  
+      },
+
+      getUserData: function(){
+        var self = this
+        if(localStorage['user'])
+        {
+         self.user = JSON.parse(localStorage['user'])
+        }
+        else
+        {
+          self.user.name = ''
+          self.user.role = 'guest'
+          self.user.id = '0'
+          self.user.hash = '0'
+
+        }
+        self.checkAuth()
+      },
+    checkRole: function(){
+      var self = this
+      if(self.user.role != 'admin')
+      {
+        self.$router.push('/')
+      }
+  },
     getUser: function(id){
         var self = this
         var xhr = new XMLHttpRequest()
@@ -79,6 +165,7 @@ export default {
         var json = JSON.stringify(self.userData);
             xhr.open("PUT", getUrl()+'users/', true)
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));            
               xhr.onreadystatechange = function() {
                   if (xhr.readyState != 4) return
                     if (xhr.status != 200) {
@@ -108,8 +195,8 @@ export default {
                 alert(xhr.status + ': ' + xhr.statusText)
               } else {
                 var res = JSON.parse(xhr.responseText)
-                if(typeof(res) == 'string'){
-                  self.msg = res
+                if(!res){
+                  self.msg = "Have no orders"
                 }
                 else{
                   self.userData.orders = JSON.parse(xhr.responseText)
@@ -134,16 +221,6 @@ export default {
       }
       return 'Inactive'
     },
-
-    // Data(){
-    //   var self = this
-    //   if(self.$route.params.id != self.uId){
-    //     // self.getUser()
-    //     console.log(self.$route.params.id)
-    //     console.log(self.userData.id)
-    //   }
-    // }
-
   },
   components:{
     'user-orders': AdminUserOrders
@@ -164,15 +241,6 @@ h1, h2 {
 
   }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
 
 td{
   padding:20px;

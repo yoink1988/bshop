@@ -14,7 +14,7 @@
               <p><label>Email address:</label></p>
               <input placeholder="Enter email" v-model="login.email" type="text">
               <label for="exampleInputPassword1">Password:</label>
-              <input placeholder="Password" v-model="login.pass" type="text">
+              <input type="password" placeholder="Password" v-model="login.pass">
               
               <p><button @click="signIn" class="login">Log In</button></p>
               <p>{{logMsg}}</p>
@@ -72,41 +72,43 @@
          </div>
 
       <div v-if="content == ''" class="col">
-        <!-- <div> -->
-          <table>
-          <tr class="row">
-          <td class="col-md-1"><b>Title</b></td>
-          <td class="col-md-3"><b>Description</b></td>
-          <td class="col-md-2"><b>Price</b></td>
-          <td class="col-md-1"><b>Authors</b></td>
-          <td class="col-md-2"><b>Genres</b></td>
-          <td class="col-md-1"><b>Discount</b></td>
-          <td class="col-md-2"><b>Discounted price</b></td></tr>
-
-          <tr class="row" v-for = "book, key in filteredBooks">
-          <td class="col-md-1"><a href="#" @click="showBookInfo(book)">{{book.title}}</a></td>
-          <td class="col-md-3">{{book.description}}</td>
-          <td class="col-md-2">{{book.price}} $</td>
-          <td class="col-md-1">
+          <table class="table" style="margin:20px; background:#fce3c7">
+              <thead>
+          <tr>
+          <td class="col"><b>Title</b></td>
+          <td class="col"><b>Description</b></td>
+          <td class="col"><b>Price</b></td>
+          <td class="col"><b>Authors</b></td>
+          <td class="col"><b>Genres</b></td>
+          <td class="col"><b>Discount</b></td>
+          <td class="col"><b>Discounted price</b></td></tr>
+  </thead>
+  <tbody>
+          <tr  v-for = "book, key in filteredBooks">
+          <td class="col"><a href="#" @click="showBookInfo(book)">{{book.title}}</a></td>
+          <td class="col">{{book.description}}</td>
+          <td class="col">{{book.price}} $</td>
+          <td class="col">
             <span v-for = "author in book.authors">
                <a  href="#" @click="setFilter('author', author.id)" > 
               {{author.name}} 
               </a>
               </span>
           </td>
-          <td class="col-md-2">
+          <td class="col">
             <span v-for = "genre in book.genres">
               <a  href="#" @click="setFilter('genre', genre.id)" > 
                 {{genre.name}} 
                 </a>
                 </span>
           </td>
-          <td class="col-md-1">{{book.discount}} %</td>
-          <td class="col-md-2">{{(book.price - book.price*book.discount/100).toFixed(2)}} $</td>
+          <td class="col">{{book.discount}} %</td>
+          <td class="col">{{(book.price - book.price*book.discount/100).toFixed(2)}} $</td>
              </tr> 
-
+</tbody>
             </table>
-        <!-- </div> -->
+
+
       </div>
 </div>
 
@@ -145,7 +147,7 @@ export default {
     this.getAuthors()
     this.getGenres()
     this.getBooks()
-    this.checkAuth()
+    
   },
     methods:{
       signIn: function(){
@@ -156,8 +158,8 @@ export default {
          login: self.login.email,
          pass: self.login.pass
       });
-      self.clearInputs()
           xhr.open("PUT", getUrl()+'auth/', true)
+          // xhr.setRequestHeader("Authorization", "Basic " + btoa(self.login.email+":"+self.login.pass));
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
@@ -173,6 +175,7 @@ export default {
                     {
                       self.user = res[0]
                       localStorage['user'] = JSON.stringify({id: self.user.id, hash: self.user.hash})
+                      self.clearInputs()
                     }
                   }
             }
@@ -253,9 +256,7 @@ export default {
         self.content = ''
         self.user = {}
         delete localStorage['user']
-        // self.$router.push({ path: '/'})
         self.getUserData()
-        self.checkAuth()
       },
       getUserData: function(){
         var self = this
@@ -269,12 +270,15 @@ export default {
           self.user.role = 'guest'
           self.user.id = '0'
           self.user.hash = '0'
+
         }
+        self.checkAuth()
       },
       checkAuth: function(){
       var self = this
       var xhr = new XMLHttpRequest();
-          xhr.open("GET", getUrl()+'auth/id/'+self.user.id+'/hash/'+self.user.hash, true)
+          xhr.open("GET", getUrl()+'auth/', true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
@@ -288,11 +292,35 @@ export default {
                     self.user.hash = '0'
                    }
                    else{
-                     self.user = res[0]
+                     self.getUserInfo()
                    }
                   }
             }
           xhr.send()        
+      },
+      getUserInfo: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'users/'+self.user.id, true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                    self.user = res[0]
+                   }
+                  }
+            }
+          xhr.send()  
       },
     clearInputs: function(){
       var self = this
@@ -392,12 +420,7 @@ a {
   font-weight: bold;
 }
 
-/* td{
-  padding:20px;
-}
-th{
-  padding:20px;
-} */
+
 .logged{
   height: 200px;
 }
@@ -407,11 +430,7 @@ table{
 }
 
 .left{
-  /* width: 400px; */
-  background-color: #E6C994;
-}
-.right{
-  /* background-color: #f0bc86; */
+  background-color: #fce3c7;
 }
 .login{
   height: 30px;

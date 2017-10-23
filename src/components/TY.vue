@@ -23,31 +23,7 @@ h1, h2 {
   /* padding: 30px; */
 }
 
-  .book{
-  background-color: lemonchiffon;
 
-  }
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-td{
-  padding:20px;
-}
-th{
-  padding:20px;
-}
-
-table{
-  margin-top: 40px;
-}
 
 .info{
   width: 40%;

@@ -1,21 +1,43 @@
 <template>
   <div class="add-book">
     <h4>Add Book</h4>
-      <div class="form">
-        <p>Book title: <input v-model="title" name="titile" type="text"/></p>
-        <p>Decription: <textarea v-model="desc" name="desc" id="" cols="30" rows="10"></textarea></p>
-        <p>Book Price: <input v-model="price" pattern="[0-9]+" name="price" type="text"/></p>
-        <p>Book discount: <input v-model="disc" name="discount" type="text"/></p>
-        <p>Select Authors: <select v-model="selectedAuthors" multiple size="5" name="" id="">
-                            <option v-for="author in authors" :value="author.id">{{author.name}}</option>
-                            </select></p>
-        <p>Select Genres: <select v-model="selectedGenres" multiple size="5" name="" id="">
-                            <option v-for="genre in genres" :value="genre.id">{{genre.name}}</option>
-                            </select></p>
-        <p><button @click="addBook()" class="test">Submit</button></p>
-        <p>{{errMsg}}</p>
-        <!-- <button @click="test()" class="test">TEST</button> -->
+        <div class="row">
+        <div class="col-md-5">
+          <form>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Book Title</label>
+              <input v-model="title"  type="text" class="form-control" >
+            </div>
+              <div class="form-group">
+                <label>Description</label>
+                <textarea v-model="desc"  class="form-control"  rows="3"></textarea>
+               </div>
+            <div class="input-group">
+              <span class="input-group-addon">Price</span>
+              <input v-model="price" type="text" class="form-control" >
+            </div>
+            <div class="input-group">
+              <span class="input-group-addon">Discount</span>
+              <input v-model="disc" type="text" class="form-control" >
+            </div>
+         
+             <div class="form-group">
+                <label >Authors to Add</label>
+                <select v-model="selectedAuthors" multiple class="form-control" >
+                  <option v-for="author in authors" :value="author.id">{{author.name}}</option>
+                </select>
+              </div>
+         
+             <div class="form-group">
+                <label >Genres to add</label>
+                <select v-model="selectedGenres" multiple class="form-control" >
+                  <option v-for="genre in genres" :value="genre.id">{{genre.name}}</option>
+                </select>
+              </div>
+              <button @click="addBook()" type="button" class="btn btn-primary btn-lg btn-block">Add</button>
+          </form>
       </div>
+    </div>
   </div>
 </template>
 
@@ -32,14 +54,89 @@ export default {
       desc:'',
       price:'',
       disc:'',
-      errMsg: ''
+      errMsg: '',
+      user:{}
     }
   },
   created(){
+    this.getUserData()
     this.getGenres()
     this.getAuthors()
   },
   methods:{
+          checkAuth: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'auth/', true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                     self.getUserInfo()
+                   }
+                  }
+            }
+          xhr.send()        
+      },
+      getUserInfo: function(){
+      var self = this
+      var xhr = new XMLHttpRequest();
+          xhr.open("GET", getUrl()+'users/'+self.user.id, true)
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));
+          xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState != 4) return
+                  if (xhr.status != 200) {
+                  } else{
+                   var res = JSON.parse(xhr.responseText)
+                   if(!res){
+                    self.user.name = ''
+                    self.user.role = 'guest'
+                    self.user.id = '0'
+                    self.user.hash = '0'
+                   }
+                   else{
+                    self.user = res[0]
+                    self.checkRole()
+                   }
+                  }
+            }
+          xhr.send()  
+      },
+
+      getUserData: function(){
+        var self = this
+        if(localStorage['user'])
+        {
+         self.user = JSON.parse(localStorage['user'])
+        }
+        else
+        {
+          self.user.name = ''
+          self.user.role = 'guest'
+          self.user.id = '0'
+          self.user.hash = '0'
+
+        }
+        self.checkAuth()
+      },
+    checkRole: function(){
+      var self = this
+      if(self.user.role != 'admin')
+      {
+        self.$router.push('/')
+      }
+  },
     getAuthors: function(){
       var self = this
         var xhr = new XMLHttpRequest()
@@ -78,10 +175,6 @@ export default {
               }
         }
     },
-    test: function(){
-      var self = this
-      console.log(self.selectedAuthors)
-    },
     addBook: function(){
       var self = this
       if(self.validForm()){
@@ -98,6 +191,7 @@ export default {
       });
           xhr.open("POST", getUrl()+'books/', true)
           xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+          xhr.setRequestHeader("Authorization", "Basic " + btoa(self.user.id+":"+self.user.hash));          
             xhr.onreadystatechange = function() {
                 if (xhr.readyState != 4) return
                   if (xhr.status != 200) {
@@ -110,7 +204,7 @@ export default {
                     }else{
                       self.errMsg = res
                     }
-                    // console.log(xhr.responseText)
+                    self.$parent.getBooks()
                   }
             }
           xhr.send(json)
@@ -160,18 +254,8 @@ h1, h2 {
 
   .book{
   background-color: lemonchiffon;
-
   }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
 
 td{
   padding:20px;

@@ -1,11 +1,14 @@
 <template>
-  <div class="cart">
-    <div v-if="content == 'cart'" class="cartt">
+  <div class="cart row" style="margin:20px">
+    <div v-if="content == 'cart'" class="col" style="text-align:center">
     <h4>Cart</h4>
     <div v-if="booksInCart">
-      <span>Your discount: {{user.discount}} %</span>
-      <table>
+      
+      <table class="table" style="bacground:#fce3c7">
+        <thead>
         <tr><td style="width:50px">Remove</td><td>Title</td><td>Count</td><td>Price</td><td>Discount</td><td>Actual Price</td><td>Summary</td></tr>
+         </thead>
+        <tbody>
         <tr v-for="(book, index) in booksInCart" :key="book.id">
           <td>
             <input type="checkbox" v-model="booksInCart[index].checkbox"  name="" id="">
@@ -14,9 +17,9 @@
             {{book.title}}
           </td>
           <td>
-            <button @click="plus(index)" class="plus">+</button>
+            <button @click="plus(index)" class="plus btnn">+</button>
             <input v-model="booksInCart[index].count" type="text" :value="book.count" size="3" class="count"> 
-            <button @click="minus(index)" class="minus">-</button>
+            <button @click="minus(index)" class="minus btnn">-</button>
           </td>
           <td>
             {{book.price}} $
@@ -38,25 +41,38 @@
           </td>
 
         </tr>
-        <tr><td>{{saveMsg}}</td><td><button @click="refresh()" class="save">Apply Changes</button></td></tr>
-        <tr><td>Total price:{{totalPrice}} $</td></tr>
-        <tr><td>Total price with your discount:{{totalWithUserDiscount }} $</td><td><button @click="goCheckOut()" class="checkout">Check out</button></td></tr>
+        </tbody>
       </table>
 
-    </div>
+    
+      <div class="row">
+          <div class="col">
+            <span class="lighter"><b>{{saveMsg}}</b></span><p><button  @click="refresh()" class="save btnn ">Apply Changes</button></p>
+            <p><span >Total price:{{totalPrice}} $</span></p>
+            <p><span>Your discount: {{user.discount}} %</span></p>
+            <div>Total price with your discount:{{totalWithUserDiscount }} $<p><button @click="goCheckOut()" class="checkout btnn">Check out</button></p>
+            </div>
+          </div>
+      </div>
+
+
+  </div>
     <div v-else>
       {{msg}}
     </div>
     </div>
-     <div v-if="content == 'checkout'" style="width:300px;margin: 60px auto;background:grey;padding:10px"  class="checkout">
+     <div v-if="content == 'checkout'" style="width:300px;margin: 60px auto;background:#fce3c7;padding:10px"  class="checkout">
        <div style="width:200px;margin: auto;padding:20px">
+         <label for="form-check">Choose Pay method:</label>
         <div style="text-align:left" v-for="(payMeth, index) in payment" :key="payMeth.id" class="form-check">
             <input  v-model="checkedPayment" name="id_payment" :value="payMeth.id"  class="form-check-input" type="radio" id="gridRadios2" >
             {{payMeth.name}}</input>
         </div>    
        </div>
-     <button  @click="addOrder()"class="btn btn-light">Add Order</button>
-     <button @click="goCart()" class="btn btn-light">Back to Cart</button>
+       <div style="text-align:center">
+      <button  @click="addOrder()"class="btnn">Add Order</button>
+      <button @click="goCart()" class="btnn">Back to Cart</button>
+     </div>
      </div>
     </div>
   </div>
@@ -305,15 +321,6 @@ h1, h2 {
 
 
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
 
 td{
   padding:20px;
@@ -334,5 +341,15 @@ table{
 
 a {
   color: #42b983;
+}
+
+.btnn{
+  height: 30px;
+  background:#FFDCA8;
+  color:black;
+}
+
+.lighter{
+  background-color: #fce3c7;
 }
 </style>

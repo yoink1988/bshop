@@ -1,16 +1,18 @@
 <template>
-  <div class="book">
-    <h3>Book Details</h3>
-    <div class="info">
-      <h4>{{book.title}}</h4>
-      <p>{{book.description}}</p>
-      <p>Authors: <span v-for="author in book.authors">{{author.name}} </span></p>
-      <p>Genres: <span v-for="genre in book.genres">{{genre.name}} </span></p>
-      <p>Price: {{book.price}} $</p>
-      <div v-if="user.role != 'guest'" class="add">
-        Count: <input v-model="count" type="text">
-        <button @click="addToCart()" class="add-to-cart">Add to Cart</button>
-        <p>{{msg}}</p>
+  <div class="book row" style="margin:20px">
+    <div class="col" style="text-align:center">
+      <h3>Book Details</h3>
+      <div class="info">
+        <h4>{{book.title}}</h4>
+        <p>{{book.description}}</p>
+        <p>Authors: <span v-for="author in book.authors">{{author.name}} </span></p>
+        <p>Genres: <span v-for="genre in book.genres">{{genre.name}} </span></p>
+        <p>Price: {{book.price}} $</p>
+        <div v-if="user.role != 'guest'" class="add">
+          Count: <input v-model="count" type="text">
+          <button @click="addToCart()" class="add-to-cart btnn">Add to Cart</button>
+          <p>{{msg}}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -27,7 +29,6 @@ export default {
     }
   },
   created(){
-    // console.log(this.user.role)
   },
   methods:{
     addToCart: function(){
@@ -69,23 +70,12 @@ export default {
 <style scoped>
 h1, h2 {
   font-weight: normal;
-  /* padding: 30px; */
 }
 
   .book{
-  background-color: lemonchiffon;
+  background-color: #fce3c7;
 
   }
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
 
 td{
   padding:20px;
@@ -105,5 +95,11 @@ table{
 
 a {
   color: #42b983;
+}
+
+.btnn{
+  height: 30px;
+  background:#FFDCA8;
+  color:black;
 }
 </style>
