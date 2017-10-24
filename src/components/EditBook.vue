@@ -51,6 +51,7 @@
               </div>
               <button @click="save()" type="button" class="btn btn-primary btn-lg btn-block">Update</button>
           </form>
+          {{msg}}
       </div>
     </div>  
   </div>
@@ -61,11 +62,9 @@ export default {
   name: 'EditBook',
       beforeRouteUpdate(to, from, next) {
         if(this.getBooks(to.params.id)){
+        this.msg = ''
         next()
         }
-        // else{
-        //   this.$router.push('/admin/')
-        // }      // }
     },
   data () {
     return {

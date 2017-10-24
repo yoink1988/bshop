@@ -242,7 +242,7 @@ export default {
     orders[index].showSelect = !orders[index].showSelect
     self.orders = orders
     self.refreshed = false
-    }
+     }
   },
 
 

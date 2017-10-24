@@ -3,8 +3,8 @@
     <h4> My Orders:</h4>
     <p>{{msg}}</p>
     <div v-if="orders">
-      <table class="table">
-        <thead>
+      <!-- <table class="table"> -->
+        <!-- <thead> -->
       <div class="or-rowhead">      
         <div class="or-cell2">
           Order ID
@@ -28,8 +28,8 @@
           <button @click="dateSort()" class="sort">^</button>
         </div>
       </div>
-  </thead>
-  <tbody>
+  <!-- </thead>
+  <tbody> -->
       <div v-for="(order, index) in arrayToDraw" :key="order.id" >
           <div @click="show(index)" class="or-row">
             <div class="or-cell2">
@@ -102,8 +102,8 @@
                 </div>
           </div>
       </div>
-  </tbody>
-  </table>
+  <!-- </tbody> -->
+  <!-- </table> -->
 </div>
 
 

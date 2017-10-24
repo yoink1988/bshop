@@ -36,6 +36,7 @@
               </div>
               <button @click="addBook()" type="button" class="btn btn-primary btn-lg btn-block">Add</button>
           </form>
+          {{errMsg}}
       </div>
     </div>
   </div>

@@ -29,9 +29,18 @@
 
               <button @click="save()" type="button" class="btn btn-primary btn-lg btn-block">Save</button>
           </form>
-
+            {{msg}}
         </div>
    </div>
+
+   <div class="row">
+     <button @click="showUserOrders()" class="show">Show Orders
+     </button>
+
+   </div>
+     <div v-if="showOrdrers" class="row">
+      <user-orders  :id="userData.id" :user="user"></user-orders>
+     </div>
    </div>
 </template>
 

@@ -64,6 +64,9 @@ export default {
                     var res = JSON.parse(xhr.responseText)
                     if(res === true){
                       self.msg = 'Thank You! Please follow to Home page for Sign In'
+                          login = ''
+                          name = ''
+                          pass = ''
                     }
                     else
                     self.msg = res

@@ -54,6 +54,7 @@ export default {
                     }
                     else{
                       self.msg = res
+                      self.count = 1
                     }
                   }
             }
